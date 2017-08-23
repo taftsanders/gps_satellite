@@ -12,11 +12,10 @@ class apicall(object):
         pass
 
     def search(self, call=None, name=None):
-        ret = requests.get(HOSTNAME + call, auth=(SAT_ADMIN, SAT_PW), verify=False)
-
+        ret = requests.get(HOSTNAME + call, auth=(SAT_ADMIN, SAT_PW), verify=False))
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
-                fw = open(name+'.json', 'w')
+                fw = open('/tmp/'+name+'.json', 'w')
                 fw.write(str(ret.json()))
                 fw.close()
             else:
