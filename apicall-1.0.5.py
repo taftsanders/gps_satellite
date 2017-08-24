@@ -115,6 +115,7 @@ class ApiCall(object):
 #Call all functions
 a = ApiCall()
 a.organization_list()
+"""
 a.location_list()
 a.capsule_list()
 a.dashboard_details()
@@ -128,4 +129,4 @@ a.user_roles_list()
 a.settings_list()
 a.subnets_list()
 a.user_list()
-
+"""

@@ -7,7 +7,7 @@
 [done]v1.0.3
 - Suppress warning messages on stdout
 
-v1.0.4
+[done]v1.0.4
 - Add print messages for each function to alert user of what api call is currently being run
 
 v1.0.5
@@ -18,3 +18,6 @@ v1.0.6
 
 v1.0.7
 - Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
+
+v1.0.8
+- Add feature to request username, password, FQDN
