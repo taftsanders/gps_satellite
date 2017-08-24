@@ -21,3 +21,6 @@ v1.0.7
 
 v1.0.8
 - Add feature to request username, password, FQDN
+
+v1.0.9
+- Add option to skip errata check if not needed
