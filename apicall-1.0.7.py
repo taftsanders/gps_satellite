@@ -6,26 +6,36 @@ import warnings
 import tarfile
 import os
 import shutil
+import getpass
 
 #Suppress all warnings. COMMENT OUT FOR DEBUG 
 warnings.filterwarnings("ignore")
 
-HOSTNAME = "http://batman.usersys.redhat.com"
-SAT_ADMIN = "admin"
-SAT_PW = "vector16"
+#HOSTNAME = "http://batman.usersys.redhat.com"
+#SAT_ADMIN = "admin"
+#SAT_PW = "vector16"
+PATH = '/tmp/gps/'
 
 class ApiCall(object):
 
     def __init__(self):
-        pass
+        self.hostname = None
+        self.sat_admin = None
+        self.sat_pw = None
+        self.information()
+
+    def information(self):
+        self.hostname = "http://"+raw_input("Please enter the FQDN or IP of the Satellite server: ")
+        self.sat_admin = raw_input("Please enter the Satellite admin username: ")
+        self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
     def search(self, call=None, name=None):
-        ret = requests.get(HOSTNAME + call, auth=(SAT_ADMIN, SAT_PW), verify=False)
+        ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
-                if not os.path.exists('/tmp/gps/'):
-                    os.makedirs('/tmp/gps/')
-                    os.chdir('/tmp/gps/')
+                if not os.path.exists(PATH):
+                    os.makedirs(PATH)
+                    os.chdir(PATH)
                 fw = open(name+'.json', 'w')
                 content = ret.content
                 fw.write(content)
@@ -39,10 +49,10 @@ class ApiCall(object):
     def clean_up(self):
         os.chdir('/tmp/')
         tar = tarfile.open("gps.tar.gz", "w:gz")
-        tar.add("/tmp/gps/", arcname='.')
+        tar.add(PATH, arcname='.')
         tar.close()
         if os.path.exists('/tmp/gps.tar.gz'):
-            shutil.rmtree('/tmp/gps/')
+            shutil.rmtree(PATH)
     
 # Gather all Satellite organizations
     def organization_list(self):

@@ -16,11 +16,11 @@
 [done]v1.0.6
 - Add feature to tar up all files
 
-v1.0.7
-- Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
+[done]v1.0.7
+- Add feature to request username, password, FQDN
 
 v1.0.8
-- Add feature to request username, password, FQDN
+- Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
 
 v1.0.9
 - Add option to skip errata check if not needed
