@@ -3,36 +3,28 @@
 import urllib3
 import requests
 import warnings
+import json
 
 #Suppress all warnings. COMMENT OUT FOR DEBUG 
 warnings.filterwarnings("ignore")
 
 HOSTNAME = "http://batman.usersys.redhat.com"
 SAT_ADMIN = "admin"
-SAT_PW = 8144392
+SAT_PW = "vector16"
 
 class ApiCall(object):
 
-    def __init__(self, username=SAT_ADMIN, password=SAT_PW, url=HOSTNAME, ssl_warnings=False, ssl_verify=False):
-#        import pdb; pdb.set_trace()
-
-        # disable SSL warnings by default
-        if not ssl_warnings:
-            urllib3.disable_warnings()
-
-        # create requests token to be used across the program
-        self.client = requests.Session()
-        self.client.auth = (username, password)
-        self.client.verify = ssl_verify
+    def __init__(self):
+        pass
 
     def search(self, call=None, name=None):
-        
-        ret = self.client.get(HOSTNAME + call)
-
+        ret = requests.get(HOSTNAME + call, auth=(SAT_ADMIN, SAT_PW), verify=False)
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
                 fw = open('/tmp/'+name+'.json', 'w')
-                fw.write(str(ret.json()))
+                content = ret.content
+                print(content)
+                fw.write(content)
                 fw.close()
             else:
                 return ret.text
@@ -115,7 +107,7 @@ class ApiCall(object):
 #Call all functions
 a = ApiCall()
 a.organization_list()
-
+"""
 a.location_list()
 a.capsule_list()
 a.dashboard_details()
@@ -129,4 +121,4 @@ a.user_roles_list()
 a.settings_list()
 a.subnets_list()
 a.user_list()
-
+"""

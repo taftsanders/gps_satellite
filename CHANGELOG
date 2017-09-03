@@ -10,7 +10,7 @@
 [done]v1.0.4
 - Add print messages for each function to alert user of what api call is currently being run
 
-v1.0.5
+[done]v1.0.5
 - Output file needs to be in json format and readable by jq/jgrep/python -m json.tool
 
 v1.0.6
