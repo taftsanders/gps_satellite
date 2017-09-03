@@ -3,7 +3,9 @@
 import urllib3
 import requests
 import warnings
-import json
+import tarfile
+import os
+import shutil
 
 #Suppress all warnings. COMMENT OUT FOR DEBUG 
 warnings.filterwarnings("ignore")
@@ -21,9 +23,11 @@ class ApiCall(object):
         ret = requests.get(HOSTNAME + call, auth=(SAT_ADMIN, SAT_PW), verify=False)
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
-                fw = open('/tmp/'+name+'.json', 'w')
+                if not os.path.exists('/tmp/gps/'):
+                    os.makedirs('/tmp/gps/')
+                    os.chdir('/tmp/gps/')
+                fw = open(name+'.json', 'w')
                 content = ret.content
-                print(content)
                 fw.write(content)
                 fw.close()
             else:
@@ -31,7 +35,15 @@ class ApiCall(object):
         else:
             print("oops {}".format(ret.status_code))
 
-
+# Tar gz all files collected from GPS
+    def clean_up(self):
+        os.chdir('/tmp/')
+        tar = tarfile.open("gps.tar.gz", "w:gz")
+        tar.add("/tmp/gps/", arcname='.')
+        tar.close()
+        if os.path.exists('/tmp/gps.tar.gz'):
+            shutil.rmtree('/tmp/gps/')
+    
 # Gather all Satellite organizations
     def organization_list(self):
         print("Gathering all Satellite Organizations")
@@ -103,10 +115,10 @@ class ApiCall(object):
         print("Gathering all Users from the Satellite")
         self.search("/api/users", "user_list")
 
-
 #Call all functions
 a = ApiCall()
 a.organization_list()
+a.clean_up()
 """
 a.location_list()
 a.capsule_list()

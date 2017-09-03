@@ -13,7 +13,7 @@
 [done]v1.0.5
 - Output file needs to be in json format and readable by jq/jgrep/python -m json.tool
 
-v1.0.6
+[done]v1.0.6
 - Add feature to tar up all files
 
 v1.0.7
