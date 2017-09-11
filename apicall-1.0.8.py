@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+from redhat-support-tool import RHHelp
 import urllib3
+from optparse import Option
 import requests
 import warnings
 import tarfile
@@ -24,11 +26,18 @@ class ApiCall(object):
         self.sat_pw = None
         self.information()
 
+        #Gather Satellite FQDN, admin username, and satellite password
     def information(self):
         self.hostname = "http://"+raw_input("Please enter the FQDN or IP of the Satellite server: ")
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
+        #Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
+        #cannot be uploaded, tarball will remain on filesystem and error will be displayed.
+    def rh_support_tool(self):
+
+
+        #API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
         ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
         if ret.ok and ret.status_code == 200:
@@ -130,6 +139,24 @@ a = ApiCall()
 a.organization_list()
 a.clean_up()
 """
+def get_options(cls):
+    return [Option('-p', '--product', dest='product',
+                        help=_('The product the case will be opened against. '
+                                '(required)'), default=None),
+                Option('-v', '--version', dest='version',
+                        help=_('The version of the product the case '
+                                'will be opened against. (required)'),
+                       default=None),
+                Option('-s', '--summary', dest='summary',
+                        help=_('A summary for the case (required)'),
+                        default=None),
+                Option('-d', '--description', dest='description',
+                        help=_('A description for the case. (required)'),
+                        default=None),
+                Option('-S', '--severity', dest='severity',
+                        help=_('The severity of the case. (optional)'),
+                        default=None)]
+
 a.location_list()
 a.capsule_list()
 a.dashboard_details()
