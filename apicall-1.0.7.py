@@ -7,6 +7,7 @@ import tarfile
 import os
 import shutil
 import getpass
+import pdb
 
 #Suppress all warnings. COMMENT OUT FOR DEBUG 
 warnings.filterwarnings("ignore")
@@ -15,6 +16,8 @@ warnings.filterwarnings("ignore")
 #SAT_ADMIN = "admin"
 #SAT_PW = "vector16"
 PATH = '/tmp/gps/'
+org_id_list = []
+lce_id_list = []
 
 class ApiCall(object):
 
@@ -25,9 +28,26 @@ class ApiCall(object):
         self.information()
 
     def information(self):
-        self.hostname = "http://"+raw_input("Please enter the FQDN or IP of the Satellite server: ")
+        self.hostname = "https://"+raw_input("Please enter the FQDN or IP of the Satellite server: ")
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
+
+    def organization_id_list(self):
+        org_list_ret = requests.get(self.hostname + '/katello/api/organizations', \
+                auth=(self.sat_admin, self.sat_pw), verify=False)
+        org_list = org_list_ret.json()
+        for x in org_list['results']:
+            org_id_list.append(x['id'])
+
+    def lce_id_list(self):
+        temp_lce_list = []
+        for x in org_id_list:
+            lce_list_ret = requests.get(self.hostname + \
+                    '/katello/api/organizations/' + str(x) + '/environments',\
+                    auth=(self.sat_admin, self.sat_pw), verify=False)
+            lce_list = lce_list_ret.json()
+            for i in lce_list['results']:
+                temp_lce_list.append(i['id'])
 
     def search(self, call=None, name=None):
         ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
@@ -127,9 +147,13 @@ class ApiCall(object):
 
 #Call all functions
 a = ApiCall()
+a.organization_id_list()
+a.lce_id_list()
+print(org_id_list)
+print(lce_id_list)
+"""
 a.organization_list()
 a.clean_up()
-"""
 a.location_list()
 a.capsule_list()
 a.dashboard_details()
