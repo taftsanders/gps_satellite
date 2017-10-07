@@ -19,8 +19,11 @@
 [done]v1.0.7
 - Add feature to request username, password, FQDN
 
-v1.0.8
-- Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
+[done]v1.0.8
+- Add organization and lce loops for inbedded api calls
 
 v1.0.9
-- Add option to skip errata check if not needed
+- Add additional api calls using org and lce loops
+
+v1.0.10
+- Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.

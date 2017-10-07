@@ -39,16 +39,19 @@ class ApiCall(object):
         org_list = org_list_ret.json()
         for x in org_list['results']:
             org_id_list.append(x['id'])
+        return org_id_list 
 
     def lce_id_list(self):
         lce_id_list = []
-        for x in org_id_list:
+        org_list = self.organization_id_list()
+        for x in org_list:
             lce_list_ret = requests.get(self.hostname + \
                     '/katello/api/organizations/' + str(x) + '/environments',
                     auth=(self.sat_admin, self.sat_pw), verify=False)
             lce_list = lce_list_ret.json()
             for i in lce_list['results']:
                 lce_id_list.append(i['id'])
+        return lce_id_list
 
         #Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
         #cannot be uploaded, tarball will remain on filesystem and error will be displayed.
@@ -154,10 +157,10 @@ class ApiCall(object):
 
 #Call all functions
 a = ApiCall()
-a.organization_id_list()
-a.lce_id_list()
-print()
-# print(lce_id_list)
+print(a.organization_id_list())
+print(a.lce_id_list())
+#print()
+#print(lce_id_list)
 """
 a.organization_list()
 a.clean_up()
