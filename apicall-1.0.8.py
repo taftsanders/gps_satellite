@@ -1,22 +1,24 @@
-#!/usr/bin/env python
+#!/usr/bin/env python
 
-from redhat-support-tool import RHHelp
-import urllib3
-from optparse import Option
+#from redhat-support-tool import RHHelp
+#from optparse import Option
 import requests
 import warnings
 import tarfile
 import os
 import shutil
 import getpass
+import pdb
 
-#Suppress all warnings. COMMENT OUT FOR DEBUG 
+# Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
 
 #HOSTNAME = "http://batman.usersys.redhat.com"
 #SAT_ADMIN = "admin"
 #SAT_PW = "vector16"
 PATH = '/tmp/gps/'
+org_id_list = []
+lce_id_list = []
 
 class ApiCall(object):
 
@@ -32,9 +34,26 @@ class ApiCall(object):
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
+    def organization_id_list(self):
+        org_list_ret = requests.get(self.hostname + '/katello/api/organizations',
+                auth=(self.sat_admin, self.sat_pw), verify=False)
+        org_list = org_list_ret.json()
+        for x in org_list['results']:
+            org_id_list.append(x['id'])
+
+    def lce_id_list(self):
+        temp_lce_list = []
+        for x in org_id_list:
+            lce_list_ret = requests.get(self.hostname + \
+                    '/katello/api/organizations/' + str(x) + '/environments',
+                    auth=(self.sat_admin, self.sat_pw), verify=False)
+            lce_list = lce_list_ret.json()
+            for i in lce_list['results']:
+                temp_lce_list.append(i['id'])
+
         #Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
         #cannot be uploaded, tarball will remain on filesystem and error will be displayed.
-    def rh_support_tool(self):
+#    def rh_support_tool(self):
 
 
         #API query, check for file path, create filepath(if needed), writes results to file.
@@ -136,9 +155,13 @@ class ApiCall(object):
 
 #Call all functions
 a = ApiCall()
+a.organization_id_list()
+a.lce_id_list()
+print(org_id_list)
+print(lce_id_list)
+"""
 a.organization_list()
 a.clean_up()
-"""
 def get_options(cls):
     return [Option('-p', '--product', dest='product',
                         help=_('The product the case will be opened against. '
