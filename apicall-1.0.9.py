@@ -155,33 +155,153 @@ class ApiCall(object):
         print("Gathering all Users from the Satellite")
         self.search("/api/users", "user_list")
 
+# Gather all architectures from Satellite
+    def arch_list(self):
+        print("Gathering all architectures from the Satellite")
+        self.search("/api/architectures", "arch_list")
+
+# Gather all audits from Satellite
+    def audit_list(self):
+        print("Gathering all audits from the Satellite")
+        self.search("/api/audits", "audit_list")
+
+# Gather all autosigns from Satellite
+    def autosign_list(self):
+        print("Gathering all autosigns from the Satellite")
+        self.search("/api/smart_proxies/smart_proxy_id/autosign", "autosign_list")
+
+# Gather all boomarks from Satellite
+    def bookmark_list(self):
+        print("Gathering all bookmarks from the Satellite")
+        self.search("/api/bookmarks", "bookmark_list")
+
+# Gather all global (common) parameters
+    def common_parameters_list(self):
+        print("Gathering all global parameters from the Satellite")
+        self.search("/api/common_parameters", "global_paramters")
+
+# Gather all compute profiles
+    def compute_profiles(self):
+        print("Gathering all compute profiles from the Satellite")
+        self.search("/api/compute_profiles", "compute_profiles")
+
+# Gather all compute resources
+    def compute_resources(self):
+        print("Gathering all compute resources from the Satellite")
+        self.search("/api/compute_resources", "compute_resources")
+
+# Gather all config groups
+    def config_groups(self):
+        print("Gathering all config groups from the Satellite")
+        self.search("/api/config_groups", "config_groups")
+
+# Gather all config reports
+    def config_reports(self):
+        print("Gathering all config reports from the Satelite")
+        self.search("/api/config_reports", "config_reports")
+
+# Gather all config templates
+    def config_templates(self):
+        print("Gathering all config templates from the Satellite")
+        self.search("/api/config_templates", "config_templates")
+
+# Gather all docker containers
+    def containers_list(self):
+        print("Gathering all docker containers from the Satellite")
+        self.search("/docker/api/v2/containers", "docker_containers")
+
+# Gather all discovered hosts
+    def discovered_hosts(self):
+        print("Gathering all discovered hosts from the Satellite")
+        self.search("/api/v2/discovered_hosts", "discovered_hosts")
+
+# Gather all discovery rules
+    def discovery_rules(self):
+        print("Gathering all discovery rules from the Satellite")
+        self.search("/api/v2/discovery_rules", "discovery_rules")
+
+# Gather all user role filters
+    def user_role_filters(self):
+        print("Gathering all user role filters from the Satellite")
+        self.search("/api/filters", "user_role_filters")
+
+# Gather all openscap arf reports
+    def arf_reports(self):
+        print("Gathering all openscap arf reports from the Satellite")
+        self.search("/api/v2/compliance/arf_reports", "openscap_arf_reports")
+
+# Gather all openscap contents
+    def openscap_contents(self):
+        print("Gathering all openscap contents from the Satellite")
+        self.search("/api/v2/compliance/scap_contents", "openscap_contents")
+
+# Gather all GPG keys
+    def gpgkey_list(self):
+        print("Gathering all GPG keys from the Satellite")
+        self.search("/katello/api/gpg_keys", "gpgkey_list")
+
+
+###########################################################################
+###################START OF DEPENDANT API CALLS############################
+###########################################################################
+
+# Gather all activation keys
+    def activation_key_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering activation keys for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/activation_keys", "activationkey_org" + str(i))
+
+# Gather all auth source ldaps
+    def auth_source_ldap_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering ldap auth sources for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/auth_source_ldaps", "auth_source_ldaps_org" + str(i))
+
+# Gather all content views
+    def content_views_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering content views for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/content_views", "content_views_org" + str(i))
+
+# Gather all puppet environments
+    def puppet_environments_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering puppet environments for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/environments", "puppet_environments_org" + str(i))
+
+# Gather all host collections
+    def host_collection_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering host collections for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
+
+# Gather all host collections
+    def host_collection_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gatering all host collections for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
+
+# Gather all hostgroups
+    def hostgroups_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all hostgroups for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/hostgroups", "hostgroups_org" + str(i))
+
 #Call all functions
 a = ApiCall()
-print(a.organization_id_list())
-print(a.lce_id_list())
-#print()
-#print(lce_id_list)
+a.content_views()
 """
+a.auth_source_ldap()
+a.activation_key_list()
 a.organization_list()
 a.clean_up()
-def get_options(cls):
-    return [Option('-p', '--product', dest='product',
-                        help=_('The product the case will be opened against. '
-                                '(required)'), default=None),
-                Option('-v', '--version', dest='version',
-                        help=_('The version of the product the case '
-                                'will be opened against. (required)'),
-                       default=None),
-                Option('-s', '--summary', dest='summary',
-                        help=_('A summary for the case (required)'),
-                        default=None),
-                Option('-d', '--description', dest='description',
-                        help=_('A description for the case. (required)'),
-                        default=None),
-                Option('-S', '--severity', dest='severity',
-                        help=_('The severity of the case. (optional)'),
-                        default=None)]
-
 a.location_list()
 a.capsule_list()
 a.dashboard_details()

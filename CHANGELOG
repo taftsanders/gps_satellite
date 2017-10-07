@@ -26,4 +26,16 @@ v1.0.9
 - Add additional api calls using org and lce loops
 
 v1.0.10
+- Add Capsule loop to gather additional capsule information
+
+v1.0.11
+- Add Content view loop to gather additional content view information
+
+v1.0.12
+- Add loop for external usergroups
+
+v1.0.13
+- Add host loop for additional host information
+
+v1.0.14
 - Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
