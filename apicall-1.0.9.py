@@ -240,6 +240,21 @@ class ApiCall(object):
         print("Gathering all GPG keys from the Satellite")
         self.search("/katello/api/gpg_keys", "gpgkey_list")
 
+# Gather all REX job history
+    def rex_history_list(self):
+        print("Gathering all REX hisotry")
+        self.search("/api/job_invocations", "rex_history")
+
+# Gather all Operating systems
+    def os_list(self):
+        print("Gathering all OS's")
+        self.search("/api/operatingsystems", "os_list")
+
+# Gather all OStree branches
+    def ostree_branches_list(self):
+        print("Gathering all OStree branches")
+        self.search("/katello/api/ostree_branches", "ostree_branches")
+
 
 ###########################################################################
 ###################START OF DEPENDANT API CALLS############################
@@ -293,6 +308,35 @@ class ApiCall(object):
         for i in x:
             print("Gathering all hostgroups for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/hostgroups", "hostgroups_org" + str(i))
+
+# Gather all hosts
+    def hosts_lists(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all hosts for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/hosts", "hosts_org" + str(i))
+
+# Gather all REX templates
+    def rex_templates_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all REX templates for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/job_templates", "rex_templates_org" + str(i))
+
+# Gather all Lifecycle Environments (LCE)
+    def lce_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all Lifecycle Environments for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/environments", "lce_org" + str(i))
+
+# Gather all Media
+    def media_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all Media for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/media", "media_org" + str(i))
+
 
 #Call all functions
 a = ApiCall()
