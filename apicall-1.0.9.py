@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 #HOSTNAME = "http://batman.usersys.redhat.com"
 #SAT_ADMIN = "admin"
 #SAT_PW = "vector16"
-PATH = '/tmp/gps/'
+PATH = '/tmp/gps/'  #The user can specify the path to be save to
 
 class ApiCall(object):
 
@@ -24,41 +24,43 @@ class ApiCall(object):
         self.hostname = None
         self.sat_admin = None
         self.sat_pw = None
-        self.information()
+        self.org_id_list = []
+        self.lce_id_list = []
 
-        #Gather Satellite FQDN, admin username, and satellite password
+        self.information()
+        self.organization_id_list()
+        self.lce_id_list()
+
+# Gather Satellite FQDN, admin username, and satellite password
     def information(self):
+        """MAKE A DOCSTRING"""
         self.hostname = "http://"+raw_input("Please enter the FQDN or IP of the Satellite server: ")
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
+# Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
-        org_id_list = []
+        """MAKE A DOCSTRING"""
         org_list_ret = requests.get(self.hostname + '/katello/api/organizations',
                 auth=(self.sat_admin, self.sat_pw), verify=False)
         org_list = org_list_ret.json()
         for x in org_list['results']:
-            org_id_list.append(x['id'])
-        return org_id_list 
+            self.org_id_list.append(x['id'])
 
+# Lifecycle env. id loop to gather all lce id's for additional information
     def lce_id_list(self):
-        lce_id_list = []
-        org_list = self.organization_id_list()
-        for x in org_list:
-            lce_list_ret = requests.get(self.hostname + \
-                    '/katello/api/organizations/' + str(x) + '/environments',
+        """MAKE A DOCSTRING"""
+        for x in self.org_id_list:
+            lce_list_ret = requests.get(self.hostname + '/katello/api/organizations/' + str(x) + '/environments',
                     auth=(self.sat_admin, self.sat_pw), verify=False)
             lce_list = lce_list_ret.json()
             for i in lce_list['results']:
-                lce_id_list.append(i['id'])
-        return lce_id_list
+                self.lce_id_list.append(i['id'])
 
         #Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
         #cannot be uploaded, tarball will remain on filesystem and error will be displayed.
 #    def rh_support_tool(self):
 
-
-        #API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
         ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
         if ret.ok and ret.status_code == 200:
@@ -66,6 +68,8 @@ class ApiCall(object):
                 if not os.path.exists(PATH):
                     os.makedirs(PATH)
                     os.chdir(PATH)
+                with open('workfile', 'r') as f:
+                read_data = f.read()
                 fw = open(name+'.json', 'w')
                 content = ret.content
                 fw.write(content)
@@ -75,6 +79,26 @@ class ApiCall(object):
         else:
             print("oops {}".format(ret.status_code))
 
+"""
+        #API query, check for file path, create filepath(if needed), writes results to file.
+    def search(self, call=None, name=None):
+        ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
+        if ret.ok and ret.status_code == 200:
+            if 'json' in ret.headers.get('Content-Type'):
+                if not os.path.exists(PATH):
+                    os.makedirs(PATH)
+                    os.chdir(PATH)
+                #with open('workfile', 'r') as f:
+                #...     read_data = f.read()
+                fw = open(name+'.json', 'w')
+                content = ret.content
+                fw.write(content)
+                fw.close()
+            else:
+                return ret.text
+        else:
+            print("oops {}".format(ret.status_code))
+"""
 # Tar gz all files collected from GPS
     def clean_up(self):
         os.chdir('/tmp/')
@@ -277,106 +301,92 @@ class ApiCall(object):
 
 # Gather all activation keys
     def activation_key_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering activation keys for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/activation_keys", "activationkey_org" + str(i))
 
 # Gather all auth source ldaps
     def auth_source_ldap_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering ldap auth sources for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/auth_source_ldaps", "auth_source_ldaps_org" + str(i))
 
 # Gather all content views
     def content_views_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering content views for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/content_views", "content_views_org" + str(i))
 
 # Gather all puppet environments
     def puppet_environments_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering puppet environments for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/environments", "puppet_environments_org" + str(i))
 
 # Gather all host collections
     def host_collection_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering host collections for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
 
 # Gather all host collections
     def host_collection_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gatering all host collections for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
 
 # Gather all hostgroups
     def hostgroups_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all hostgroups for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/hostgroups", "hostgroups_org" + str(i))
 
 # Gather all hosts
     def hosts_lists(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all hosts for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/hosts", "hosts_org" + str(i))
 
 # Gather all REX templates
     def rex_templates_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all REX templates for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/job_templates", "rex_templates_org" + str(i))
 
 # Gather all Lifecycle Environments (LCE)
     def lce_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all Lifecycle Environments for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/environments", "lce_org" + str(i))
 
 # Gather all Media
     def media_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all Media for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/media", "media_org" + str(i))
 
 # Gather all Products
     def products_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all Products for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/products", "products_org" + str(i))
 
 # Gather all provisioning templates
     def provisioning_templates_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all Provisioning templates for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/provisioning_templates", "provisioning_templates_org" + str(i))
 
 # Gather all partition tables
     def partition_tables_list(self):
-        x = self.organization_id_list()
-        for i in x:
+        for i in self.org_id_list:
             print("Gathering all Partition tables for Org id: " + str(i))
             self.search("/api/organizations/:organization_id/ptables" + str(i) + "/ptables", "partition_tables_org" + str(i))
 
 
 #Call all functions
 a = ApiCall()
-a.content_views()
+a.content_views_list()
 """
 a.auth_source_ldap()
 a.activation_key_list()
