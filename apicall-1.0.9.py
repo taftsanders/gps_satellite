@@ -255,6 +255,21 @@ class ApiCall(object):
         print("Gathering all OStree branches")
         self.search("/katello/api/ostree_branches", "ostree_branches")
 
+# Gather all permissions
+    def permissions_list(self):
+        print("Gathering all permissions")
+        self.search("/api/permissions", "permissions_list")
+
+# Gather all recurring logics
+    def recurring_logics(self):
+        print("Gathering all recurring logics")
+        self.search("/foreman_tasks/api/recurring_logics", "recurring_logics")
+
+# Gather all docker registries
+    def docker_registries(self):
+        print("Gathering all docker registries")
+        self.search("/docker/api/v2/registries", "docker_registries")
+
 
 ###########################################################################
 ###################START OF DEPENDANT API CALLS############################
@@ -336,6 +351,27 @@ class ApiCall(object):
         for i in x:
             print("Gathering all Media for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/media", "media_org" + str(i))
+
+# Gather all Products
+    def products_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all Products for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/products", "products_org" + str(i))
+
+# Gather all provisioning templates
+    def provisioning_templates_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all Provisioning templates for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/provisioning_templates", "provisioning_templates_org" + str(i))
+
+# Gather all partition tables
+    def partition_tables_list(self):
+        x = self.organization_id_list()
+        for i in x:
+            print("Gathering all Partition tables for Org id: " + str(i))
+            self.search("/api/organizations/:organization_id/ptables" + str(i) + "/ptables", "partition_tables_org" + str(i))
 
 
 #Call all functions
