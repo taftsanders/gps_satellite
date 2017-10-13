@@ -39,3 +39,6 @@ v1.0.13
 
 v1.0.14
 - Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
+
+v1.0.15
+- Add Pulp api calls
