@@ -29,7 +29,7 @@ class ApiCall(object):
 
         self.information()
         self.organization_id_list()
-        self.lce_id_list()
+#        self.lce_id_list()
 
 # Gather Satellite FQDN, admin username, and satellite password
     def information(self):
@@ -57,10 +57,30 @@ class ApiCall(object):
             for i in lce_list['results']:
                 self.lce_id_list.append(i['id'])
 
-        #Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
-        #cannot be uploaded, tarball will remain on filesystem and error will be displayed.
-#    def rh_support_tool(self):
+#Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
+#cannot be uploaded, tarball will remain on filesystem and error will be displayed.
+#def rh_support_tool(self):
 
+#    def search(self, call=None, name=None):
+#        ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
+#        if ret.ok and ret.status_code == 200:
+#            if 'json' in ret.headers.get('Content-Type'):
+#                if not os.path.exists(PATH):
+#                    os.makedirs(PATH)
+#                   os.chdir(PATH)
+#                with open('workfile', 'r') as f:
+#                read_data = f.read()
+#                fw = open(name+'.json', 'w')
+#                content = ret.content
+#                fw.write(content)
+#                fw.close()
+#            else:
+#                return ret.text
+#        else:
+#            print("oops {}".format(ret.status_code))
+
+
+# API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
         ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
         if ret.ok and ret.status_code == 200:
@@ -68,8 +88,6 @@ class ApiCall(object):
                 if not os.path.exists(PATH):
                     os.makedirs(PATH)
                     os.chdir(PATH)
-                with open('workfile', 'r') as f:
-                read_data = f.read()
                 fw = open(name+'.json', 'w')
                 content = ret.content
                 fw.write(content)
@@ -79,26 +97,6 @@ class ApiCall(object):
         else:
             print("oops {}".format(ret.status_code))
 
-"""
-        #API query, check for file path, create filepath(if needed), writes results to file.
-    def search(self, call=None, name=None):
-        ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
-        if ret.ok and ret.status_code == 200:
-            if 'json' in ret.headers.get('Content-Type'):
-                if not os.path.exists(PATH):
-                    os.makedirs(PATH)
-                    os.chdir(PATH)
-                #with open('workfile', 'r') as f:
-                #...     read_data = f.read()
-                fw = open(name+'.json', 'w')
-                content = ret.content
-                fw.write(content)
-                fw.close()
-            else:
-                return ret.text
-        else:
-            print("oops {}".format(ret.status_code))
-"""
 # Tar gz all files collected from GPS
     def clean_up(self):
         os.chdir('/tmp/')
@@ -137,7 +135,7 @@ class ApiCall(object):
     def errata_list(self):
         print("Gathering all Errata synced on the Satllite")
         print("**This may take a while**")
-        self.search("/katello/api/errata?per_page=20000", "errata_list")
+        self.search("/katello/api/errata?per_page=20", "errata_list")
 
 # Gather all openscap policies on the Satellite
     def openscap_policy_list(self):
@@ -266,7 +264,7 @@ class ApiCall(object):
 
 # Gather all REX job history
     def rex_history_list(self):
-        print("Gathering all REX hisotry")
+        print("Gathering all REX history")
         self.search("/api/job_invocations", "rex_history")
 
 # Gather all Operating systems
@@ -293,6 +291,41 @@ class ApiCall(object):
     def docker_registries(self):
         print("Gathering all docker registries")
         self.search("/docker/api/v2/registries", "docker_registries")
+
+# Gather all REX features
+    def rex_features_list(self):
+        print("Gathering all REX features")
+        self.search("/api/remote_execution_features", "rex_features")
+
+# Gather all reports for Capsules?
+    def reports_list(self):
+        print("Gathering all reports")
+        self.search("/api/reports", "reports")
+
+# Gather all smart proxies
+    def smart_proxy_list(self):
+        print("Gathering all smart proxies")
+        self.search("/api/smart_variables", "smart_proxies_list")
+
+# Gather all smart variables
+    def smart_variables_list(self):
+        print("Gathering all smart variables")
+        self.search("/api/smart_variables", "smart_variables_list")
+
+# Gather Statistics
+    def statistics(self):
+        print("Gathering statistics")
+        self.search("/api/statistics", "statistics")
+
+# Gather Template kinds
+    def template_kind_list(self):
+        print("Gathering Template kinds")
+        self.search("/api/template_kinds", "template_kinds")
+
+# Gather Usergroups
+    def usergroup_list(self):
+        print("Gathering usergroup list")
+        self.search("/api/usergroups", "usergroups")
 
 
 ###########################################################################
@@ -327,12 +360,6 @@ class ApiCall(object):
     def host_collection_list(self):
         for i in self.org_id_list:
             print("Gathering host collections for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
-
-# Gather all host collections
-    def host_collection_list(self):
-        for i in self.org_id_list:
-            print("Gatering all host collections for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
 
 # Gather all hostgroups
@@ -383,13 +410,36 @@ class ApiCall(object):
             print("Gathering all Partition tables for Org id: " + str(i))
             self.search("/api/organizations/:organization_id/ptables" + str(i) + "/ptables", "partition_tables_org" + str(i))
 
+# Gather all subscriptions
+    def subscription_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Subscriptions for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/subscriptions", "subscriptions_org" + str(i))
+
+# Gather manifest history
+    def manifest_history(self):
+        for i in self.org_id_list:
+            print("Gathering Manifest history for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/subscriptions/manifest_history", "manifest_history_org" + str(i))
+
+# Gather sync plans
+    def sync_plan_list(self):
+        for i in self.org_id_list:
+            print("Gathering Sync plan for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/sync_plans", "sync_plan_org" + str(i))
+
+# Gather Uebercerts
+    def uebercert_list(self):
+        for i in self.org_id_list:
+            print("Gathering Ubercert for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/uebercert", "uebercert_org" + str(i))
 
 #Call all functions
 a = ApiCall()
-a.content_views_list()
-"""
-a.auth_source_ldap()
-a.activation_key_list()
+###########################
+#####INDEPENDENT CALLS#####
+###########################
+
 a.organization_list()
 a.clean_up()
 a.location_list()
@@ -405,5 +455,54 @@ a.user_roles_list()
 a.settings_list()
 a.subnets_list()
 a.user_list()
-"""
-
+a.arch_list()
+a.audit_list()
+a.autosign_list()
+a.bookmark_list()
+a.common_parameters_list()
+a.compute_profiles()
+a.compute_resources()
+a.config_groups()
+a.config_reports()
+a.config_templates()
+a.containers_list()
+a.discovered_hosts()
+a.discovery_rules()
+a.user_role_filters()
+a.arf_reports()
+a.openscap_contents()
+a.gpgkey_list()
+a.rex_history_list()
+a.os_list()
+a.ostree_branches_list()
+a.permissions_list()
+a.recurring_logics()
+a.docker_registries()
+a.rex_features_list()
+a.reports_list()
+a.smart_proxy_list()
+a.smart_variables_list()
+a.statistics()
+a.template_kind_list()
+a.usergroup_list()
+#############################
+#####DEPENDENT CALLS#########
+#############################
+a.activation_key_list()
+a.auth_source_ldap_list()
+a.content_views_list()
+a.puppet_environments_list()
+a.host_collection_list()
+a.hostgroups_list()
+a.hosts_lists()
+a.rex_templates_list()
+a.lce_list()
+a.media_list()
+a.products_list()
+a.provisioning_templates_list()
+a.partition_tables_list()
+a.subscription_list()
+a.manifest_history()
+a.sync_plan_list()
+a.uebercert_list()
+a.clean_up()
