@@ -13,10 +13,7 @@ import pdb
 # Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
 
-#HOSTNAME = "http://batman.usersys.redhat.com"
-#SAT_ADMIN = "admin"
-#SAT_PW = "vector16"
-PATH = '/tmp/gps/'  #The user can specify the path to be save to
+PATH = '/tmp/gps/'
 
 class ApiCall(object):
 
@@ -25,11 +22,22 @@ class ApiCall(object):
         self.sat_admin = None
         self.sat_pw = None
         self.org_id_list = []
-        self.lce_id_list = []
-
+        self.lifecycle_id_list = []
+        self.cap_id_list = []
+        self.compute_res_id_list = []
+        self.contentview_id = []
+        self.contentview_filter_id = []
+        self.hosts_id = []
+        self.smart_variable_id = []
         self.information()
         self.organization_id_list()
-#        self.lce_id_list()
+        self.capsule_id_list()
+        self.lce_id_list()
+        self.compute_resource_id_list()
+        self.contentview_id_list()
+        self.contentview_filter_id_list()
+        self.hosts_id_list()
+        self.smart_variable_id_list()
 
 # Gather Satellite FQDN, admin username, and satellite password
     def information(self):
@@ -47,6 +55,15 @@ class ApiCall(object):
         for x in org_list['results']:
             self.org_id_list.append(x['id'])
 
+# Capsule id loop to gather all capsule id's for additional api calls
+    def capsule_id_list(self):
+        """MAKE A DOCSTRING"""
+        capsule_list_ret = requests.get(self.hostname + '/katello/api/capsules',
+                auth=(self.sat_admin, self.sat_pw), verify=False)
+        cap_list = capsule_list_ret.json()
+        for x in cap_list['results']:
+            self.cap_id_list.append(x['id'])
+
 # Lifecycle env. id loop to gather all lce id's for additional information
     def lce_id_list(self):
         """MAKE A DOCSTRING"""
@@ -55,7 +72,56 @@ class ApiCall(object):
                     auth=(self.sat_admin, self.sat_pw), verify=False)
             lce_list = lce_list_ret.json()
             for i in lce_list['results']:
-                self.lce_id_list.append(i['id'])
+                self.lifecycle_id_list.append(i['id'])
+
+# Compute resource id loop to gather all compute resource id's for additional information
+    def compute_resource_id_list(self):
+        """MAKE A DOCSTRING"""
+        compute_resource_list_ret = requests.get(self.hostname + '/api/compute_resources',
+                auth=(self.sat_admin, self.sat_pw), verify=False)
+        compute_res_list = compute_resource_list_ret.json()
+        for x in compute_res_list['results']:
+            self.compute_res_id_list.append(x['id'])
+
+# Content view id loop to gather all content view id's for additional information
+    def contentview_id_list(self):
+        """MAKE A DOCSTRING"""
+        for x in self.org_id_list:
+            cv_list_ret = requests.get(self.hostname + '/katello/api/organizations/' + str(x) + '/content_views',
+                    auth=(self.sat_admin, self.sat_pw), verify=False)
+            cv_list = cv_list_ret.json()
+            for i in cv_list['results']:
+                self.contentview_id.append(i['id'])
+
+# Content view filter id loop to gather all content view filter id's for additional information
+    def contentview_filter_id_list(self):
+        """MAKE A DOCSTRING"""
+        for x in self.org_id_list:
+            cv_filter_list_ret = requests.get(self.hostname + '/katello/api/content_views/' + str(x) + '/filters',
+                    auth=(self.sat_admin, self.sat_pw), verify=False)
+            cv_filter_list = cv_filter_list_ret.json()
+            for i in cv_filter_list['results']:
+                self.contentview_filter_id.append(i['id'])
+
+# Host id loop to gather all host id's for additional information
+    def hosts_id_list(self):
+        """MAKE A DOCSTRING"""
+        for x in self.org_id_list:
+            host_list_ret = requests.get(self.hostname + '/api/organizations/' + str(x) + '/hosts',
+                    auth=(self.sat_admin, self.sat_pw), verify=False)
+            host_list = host_list_ret.json()
+            for i in host_list['results']:
+                self.hosts_id.append(i['id'])
+
+# Smart variable id loop to gather all smart variable id's for additional information
+    def smart_variable_id_list(self):
+        """MAKE A DOCSTRING"""
+        smart_variable_list_ret = requests.get(self.hostname + '/api/smart_variables',
+                auth=(self.sat_admin, self.sat_pw), verify=False)
+        smart_variable_list = smart_variable_list_ret.json()
+        for x in smart_variable_list['results']:
+            self.smart_variable_id.append(x['id'])
+
 
 #Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
 #cannot be uploaded, tarball will remain on filesystem and error will be displayed.
@@ -327,7 +393,30 @@ class ApiCall(object):
         print("Gathering usergroup list")
         self.search("/api/usergroups", "usergroups")
 
+# Gather content view filters
+    def contentview_filters(self):
+        print("Gathering content view filters")
+        self.search("/katello/api/content_view_filters", "contentviewfilters")
 
+# Gather content view versions
+    def contentview_versions(self):
+        print("Gathering all content view versions")
+        self.search("/katello/api/content_view_versions", "contentviewversions")
+
+# Gather all Docker manifests
+    def docker_manifests(self):
+        print("Gathering all docker manifests")
+        self.search("/katello/api/docker_manifests", "dockermanifests")
+
+# Gather all Docker tags
+    def docker_tags(self):
+        print("Gathering all docker tags")
+        self.search("/katello/api/docker_tags", "dockertags")
+
+# Gather all sub-man fact values
+    def fact_values(self):
+        print("Gathering all fact values")
+        self.search("/api/fact_values", "sub-man_fact_values")
 ###########################################################################
 ###################START OF DEPENDANT API CALLS############################
 ###########################################################################
@@ -434,14 +523,77 @@ class ApiCall(object):
             print("Gathering Ubercert for Org id: " + str(i))
             self.search("/katello/api/organizations/" + str(i) + "/uebercert", "uebercert_org" + str(i))
 
+# Gather Capsule assigned lifecycle environments
+    def capsule_lce_assigned_list(self):
+        for i in self.cap_id_list:
+            print("Gathering Capsule's assigned Lifecycle environments for Capsule id: " + str(i))
+            self.search("/katello/api/capsules/" + str(i) + "/content/lifecycle_environments",
+                        "capsule_lce_assigned_cap" + str(i))
+
+# Gather Capsule available lifecycle environments
+    def capsule_lce_available_list(self):
+        for i in self.cap_id_list:
+            print("Gathering Capsule's available Lifecycle environments for Capsule id: " + str(i))
+            self.search("/katello/api/capsules/" + str(i) + "/content/available_lifecycle_environments",
+                        "capsule_lce_available_cap" + str(i))
+
+# Gather Capsule sync status
+    def capsule_sync_status_list(self):
+        for i in self.cap_id_list:
+            print("Gathering Capsule's sync status for Capsule id: " + str(i))
+            self.search("/katello/api/capsules/" + str(i) + "/content/sync", "capsule_lce_assigned_cap" + str(i))
+
+# Gather Capsule sync status
+    def cr_avail_img_list(self):
+        for i in self.compute_res_id_list:
+            print("Gathering available images for Compute resource id: " + str(i))
+            self.search("/api/compute_resource/" + str(i) + "/available_images", "cr_available_img_cr" + str(i))
+
+# Gather Content view filter rules
+    def cv_filter_rules_list(self):
+        for i in self.contentview_filter_id:
+            print("Gathering Content view filter rules for Content view filter id: " + str(i))
+            self.search("/katello/api/content_view_filters/" + str(i) + "/rules", "cv_filter_rules_cv_filter" + str(i))
+
+# Gather Content view filters
+#    def cv_filter_list(self):
+#        for i in self.contentview_id:
+#            print("Gathering Content view filters for Content view id: " + str(i))
+#            self.search("/katello/api/content_view/" + str(i) + "/filters", "cv_filter_cv" + str(i))
+
+# Gather Content view history
+    def cv_history_list(self):
+        for i in self.contentview_id:
+            print("Gathering Content view history for Content view id: " + str(i))
+            self.search("/katello/api/content_views/" + str(i) + "/history", "cv_history_cv" + str(i))
+
+# Gather Content view puppet modules
+    def cv_puppet_modules_list(self):
+        for i in self.contentview_id:
+            print("Gathering Content view puppet modules for Content view id: " + str(i))
+            self.search("/katello/api/content_views/" + str(i) + "/content_view_puppet_modules",
+                        "cv_puppet_modules_cv" + str(i))
+
+# Gather all subscriptions assigned to each host
+    def host_sub_list(self):
+        for i in self.hosts_id:
+            print("Gathering Host's subscriptions for Host id: " + str(i))
+            self.search("/api/hosts/" + str(i) + "/subscriptions", "host_subscriptions_host" + str(i))
+
+# Gather all override values for smart variables
+    def override_values_list(self):
+        for i in self.smart_variable_id:
+            print("Gathering override values for smart variable id: " + str(i))
+            self.search("/api/smart_variables/" + str(i) + "/override_values", "override_values_sv" + str(i))
+
+
 #Call all functions
 a = ApiCall()
 ###########################
 #####INDEPENDENT CALLS#####
 ###########################
-
+"""
 a.organization_list()
-a.clean_up()
 a.location_list()
 a.capsule_list()
 a.dashboard_details()
@@ -485,6 +637,11 @@ a.smart_variables_list()
 a.statistics()
 a.template_kind_list()
 a.usergroup_list()
+a.contentview_filters()
+a.contentview_versions()
+a.docker_manifests()
+a.docker_tags()
+a.fact_values()
 #############################
 #####DEPENDENT CALLS#########
 #############################
@@ -505,5 +662,14 @@ a.subscription_list()
 a.manifest_history()
 a.sync_plan_list()
 a.uebercert_list()
-
+a.capsule_lce_assigned_list()
+a.capsule_lce_available_list()
+a.capsule_sync_status_list()
+a.capsule_details()
+a.cr_avail_img_list()
+a.cv_filter_rules_list()
+a.cv_history_list()
+a.cv_puppet_modules_list()
 a.clean_up()
+a.override_values_list()
+"""
