@@ -26,7 +26,6 @@ class ApiCall(object):
         self.cap_id_list = []
         self.compute_res_id_list = []
         self.contentview_id = []
-        self.contentview_filter_id = []
         self.hosts_id = []
         self.smart_variable_id = []
         self.information()
@@ -35,7 +34,6 @@ class ApiCall(object):
         self.lce_id_list()
         self.compute_resource_id_list()
         self.contentview_id_list()
-        self.contentview_filter_id_list()
         self.hosts_id_list()
         self.smart_variable_id_list()
 
@@ -92,16 +90,6 @@ class ApiCall(object):
             cv_list = cv_list_ret.json()
             for i in cv_list['results']:
                 self.contentview_id.append(i['id'])
-
-# Content view filter id loop to gather all content view filter id's for additional information
-    def contentview_filter_id_list(self):
-        """MAKE A DOCSTRING"""
-        for x in self.org_id_list:
-            cv_filter_list_ret = requests.get(self.hostname + '/katello/api/content_views/' + str(x) + '/filters',
-                    auth=(self.sat_admin, self.sat_pw), verify=False)
-            cv_filter_list = cv_filter_list_ret.json()
-            for i in cv_filter_list['results']:
-                self.contentview_filter_id.append(i['id'])
 
 # Host id loop to gather all host id's for additional information
     def hosts_id_list(self):
@@ -526,22 +514,31 @@ class ApiCall(object):
 # Gather Capsule assigned lifecycle environments
     def capsule_lce_assigned_list(self):
         for i in self.cap_id_list:
-            print("Gathering Capsule's assigned Lifecycle environments for Capsule id: " + str(i))
-            self.search("/katello/api/capsules/" + str(i) + "/content/lifecycle_environments",
+            if i == 1:
+                print("No lifecycle environments for internal Satellite's Capsule, SKIPPING")
+            else:
+           	print("Gathering Capsule's assigned Lifecycle environments for Capsule id: " + str(i))
+           	self.search("/katello/api/capsules/" + str(i) + "/content/lifecycle_environments",
                         "capsule_lce_assigned_cap" + str(i))
 
 # Gather Capsule available lifecycle environments
     def capsule_lce_available_list(self):
         for i in self.cap_id_list:
-            print("Gathering Capsule's available Lifecycle environments for Capsule id: " + str(i))
-            self.search("/katello/api/capsules/" + str(i) + "/content/available_lifecycle_environments",
+            if i == 1:
+                print("No lifecycle environments for internal Satellite's Capsule, SKIPPING")
+            else:
+           	print("Gathering Capsule's available Lifecycle environments for Capsule id: " + str(i))
+           	self.search("/katello/api/capsules/" + str(i) + "/content/available_lifecycle_environments",
                         "capsule_lce_available_cap" + str(i))
 
 # Gather Capsule sync status
     def capsule_sync_status_list(self):
         for i in self.cap_id_list:
-            print("Gathering Capsule's sync status for Capsule id: " + str(i))
-            self.search("/katello/api/capsules/" + str(i) + "/content/sync", "capsule_lce_assigned_cap" + str(i))
+            if i == 1:
+                print("No sync status for Satellite's internal Capsule, SKIPPING")
+            else:
+           	print("Gathering Capsule's sync status for Capsule id: " + str(i))
+           	self.search("/katello/api/capsules/" + str(i) + "/content/sync", "capsule_lce_assigned_cap" + str(i))
 
 # Gather Capsule sync status
     def cr_avail_img_list(self):
@@ -549,17 +546,11 @@ class ApiCall(object):
             print("Gathering available images for Compute resource id: " + str(i))
             self.search("/api/compute_resource/" + str(i) + "/available_images", "cr_available_img_cr" + str(i))
 
-# Gather Content view filter rules
-    def cv_filter_rules_list(self):
-        for i in self.contentview_filter_id:
-            print("Gathering Content view filter rules for Content view filter id: " + str(i))
-            self.search("/katello/api/content_view_filters/" + str(i) + "/rules", "cv_filter_rules_cv_filter" + str(i))
-
 # Gather Content view filters
-#    def cv_filter_list(self):
-#        for i in self.contentview_id:
-#            print("Gathering Content view filters for Content view id: " + str(i))
-#            self.search("/katello/api/content_view/" + str(i) + "/filters", "cv_filter_cv" + str(i))
+    def cv_filter_list(self):
+        for i in self.contentview_id:
+            print("Gathering Content view filters for Content view id: " + str(i))
+            self.search("/katello/api/content_view/" + str(i) + "/filters", "cv_filter_cv" + str(i))
 
 # Gather Content view history
     def cv_history_list(self):
@@ -592,7 +583,6 @@ a = ApiCall()
 ###########################
 #####INDEPENDENT CALLS#####
 ###########################
-"""
 a.organization_list()
 a.location_list()
 a.capsule_list()
@@ -665,11 +655,9 @@ a.uebercert_list()
 a.capsule_lce_assigned_list()
 a.capsule_lce_available_list()
 a.capsule_sync_status_list()
-a.capsule_details()
 a.cr_avail_img_list()
-a.cv_filter_rules_list()
+a.cv_filter_list()
 a.cv_history_list()
 a.cv_puppet_modules_list()
 a.clean_up()
 a.override_values_list()
-"""
