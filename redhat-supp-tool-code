@@ -1,0 +1,25 @@
+# from redhat-support-tool import RHHelp
+# from optparse import Option
+
+# Using redhat-support-tool, upload gps-satellite tarball to case provided by user. If tarball
+        # cannot be uploaded, tarball will remain on filesystem and error will be displayed.
+        # def rh_support_tool(self):
+
+        #    def search(self, call=None, name=None):
+        #        ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
+        #        if ret.ok and ret.status_code == 200:
+        #            if 'json' in ret.headers.get('Content-Type'):
+        #                if not os.path.exists(PATH):
+        #                    os.makedirs(PATH)
+        #                   os.chdir(PATH)
+        #                with open('workfile', 'r') as f:
+        #                read_data = f.read()
+        #                fw = open(name+'.json', 'w')
+        #                content = ret.content
+        #                fw.write(content)
+        #                fw.close()
+        #            else:
+        #                return ret.text
+        #        else:
+        #            print("oops {}".format(ret.status_code))
+
