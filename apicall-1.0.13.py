@@ -16,6 +16,27 @@ PATH = '/tmp/gps/'
 
 class ApiCall(object):
     def __init__(self):
+        """Initializing needed variables and lists for all api calls
+
+        hostname = FQDN or ip address of the Satellite server
+        sat_admin = admin user of the Satellite
+        sat_pw = password for the admin user
+        org_id_list = list of ids for all orgs
+        lifecycle_id_list = list of ids for all lce
+        cap_id_list = list of ids for all capsules
+        compute_res_id_list = list of ids for all computer resources
+        contentview_id = list of ids for all content views
+        hosts_id = list of ids for all hosts
+        smart_variable_id = list of ids for all smart variables
+        information = function to gather hostname, admin user, and password from user
+        organization_id_list = initial collection of organization ids
+        capsule_id_list = initial collection of capsule ids
+        lce_id_list = initial collection of lifecycle environment ids
+        compute_resource_id_list = initial collection of compute resources ids
+        contentview_id_list = initial collection of content view ids
+        hosts_id_list = initial collection of of hosts ids
+        smart_variable_id_list = initial collection of smart variable ids
+        """
         self.hostname = None
         self.sat_admin = None
         self.sat_pw = None
@@ -37,14 +58,14 @@ class ApiCall(object):
 
     # Gather Satellite FQDN, admin username, and satellite password
     def information(self):
-        """MAKE A DOCSTRING"""
+        """Function to gather hostname, admin user, and password from user."""
         self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
     # Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collect organization ids."""
         org_list_ret = requests.get(self.hostname + '/katello/api/organizations',
                                     auth=(self.sat_admin, self.sat_pw), verify=False)
         org_list = org_list_ret.json()
@@ -113,7 +134,9 @@ class ApiCall(object):
 
     # API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
-        ret = requests.get(self.hostname + call, auth=(self.sat_admin, self.sat_pw), verify=False)
+        s = requests.Session()
+        s.auth = (self.sat_admin, self.sat_pw)
+        ret = s.get(self.hostname + call, auth=s.auth, verify=False)
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
                 if not os.path.exists(PATH):
@@ -126,7 +149,7 @@ class ApiCall(object):
             else:
                 return ret.text
         else:
-            print("oops {}".format(ret.status_code))
+            print("Return {}, content not available".format(ret.status_code))
 
     # Tar gz all files collected from GPS
     def clean_up(self):
