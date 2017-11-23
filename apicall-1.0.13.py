@@ -38,9 +38,13 @@ class ApiCall(object):
         hosts_id_list = initial collection of of hosts ids
         smart_variable_id_list = initial collection of smart variable ids
         """
-        self.hostname = None
-        self.sat_admin = None
-        self.sat_pw = None
+        self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+        self.sat_admin = raw_input("Please enter the Satellite admin username: ")
+        self.sat_pw = getpass.getpass("Please enter the password of this user: ")
+        #self.hostname = "http://batmaan.usersys.redhat.com"
+        #self.sat_admin = "admin"
+        #self.sat_pw = "vector16"
+        requests.Session()
         self.org_id_list = []
         self.lifecycle_id_list = []
         self.cap_id_list = []
@@ -48,7 +52,6 @@ class ApiCall(object):
         self.contentview_id = []
         self.hosts_id = []
         self.smart_variable_id = []
-        self.information()
         self.organization_id_list()
         self.capsule_id_list()
         self.lce_id_list()
@@ -57,24 +60,19 @@ class ApiCall(object):
         self.hosts_id_list()
         self.smart_variable_id_list()
 
-    # Gather Satellite FQDN, admin username, and satellite password
-    def information(self):
-        """Function to gather hostname, admin user, and password from user."""
-        #self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
-        #self.sat_admin = raw_input("Please enter the Satellite admin username: ")
-        #self.sat_pw = getpass.getpass("Please enter the password of this user: ")
-        self.hostname = "http://batman.usersys.redhat.com"
-        self.sat_admin = "admin"
-        self.sat_pw = "vector16"
-
     # Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
         """Collect organization ids."""
-        org_list_ret = requests.get(self.hostname + '/katello/api/organizations',
-                                    auth=(self.sat_admin, self.sat_pw), verify=False)
-        org_list = org_list_ret.json()
-        for x in org_list['results']:
-            self.org_id_list.append(x['id'])
+        try:
+            org_list_ret = requests.get(self.hostname + '/katello/api/organizations',
+                                        auth=(self.sat_admin, self.sat_pw), verify=False)
+            org_list = org_list_ret.json()
+            for x in org_list['results']:
+                self.org_id_list.append(x['id'])
+        except (requests.exceptions.ConnectionError, KeyError):
+            print("Looks like the hostname/IP is incorrect, and/or the username/password is incorrect. Please double check"
+                  " these entries and try again.")
+            self.__init__()
 
     # Capsule id loop to gather all capsule id's for additional api calls
     def capsule_id_list(self):
@@ -208,7 +206,7 @@ class ApiCall(object):
 
     # Gather all errata synced from the Satellite
     def errata_list(self):
-        print("Gathering all Errata synced on the Satllite")
+        print("Gathering all Errata synced on the Satellite")
         print("**This may take a while**")
         self.search("/katello/api/errata?per_page=20", "errata_list")
 
