@@ -7,6 +7,7 @@ import os
 import shutil
 import getpass
 import argparse
+import subprocess
 
 # Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
@@ -59,9 +60,12 @@ class ApiCall(object):
     # Gather Satellite FQDN, admin username, and satellite password
     def information(self):
         """Function to gather hostname, admin user, and password from user."""
-        self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
-        self.sat_admin = raw_input("Please enter the Satellite admin username: ")
-        self.sat_pw = getpass.getpass("Please enter the password of this user: ")
+        #self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+        #self.sat_admin = raw_input("Please enter the Satellite admin username: ")
+        #self.sat_pw = getpass.getpass("Please enter the password of this user: ")
+        self.hostname = "http://batman.usersys.redhat.com"
+        self.sat_admin = "admin"
+        self.sat_pw = "vector16"
 
     # Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
@@ -159,6 +163,23 @@ class ApiCall(object):
         tar.close()
         if os.path.exists('/tmp/gps.tar.gz'):
             shutil.rmtree(PATH)
+
+    def rhst_upload(self):
+        option = raw_input("Would you like to upload this file to your case? [Y/N]:\n(Please note this will require "
+                           "installing the redhat-support-tool if you do not already have it installed)\n")
+        while True:
+            if option.upper() == 'Y':
+                case_num = raw_input("Please enter the case number you wish to upload this mapping to: ")
+                command = "redhat-support-tool addattachment -c " + case_num + " /tmp/gps.tar.gz"
+                subprocess.Popen(command, shell=True)
+                break
+            elif option.upper() == 'N':
+                break
+            else:
+                print("ERROR: INCORRECT VALUE ENTERED")
+                option = raw_input("Please enter a valid selection: 'Y' for yes or 'N' for no: ")
+                option.upper()
+
 
     # Gather all Satellite organizations
     def organization_list(self):
@@ -679,6 +700,7 @@ def main():
     elif args.errata:
         a.errata_list()
         a.clean_up()
+        a.rhst_upload()
     else:
         ###########################
         #####INDEPENDENT CALLS#####
