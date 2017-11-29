@@ -179,11 +179,11 @@ class ApiCall(object):
                     print "installing redhat-support-tool..."
                     subprocess.Popen("yum install redhat-support-tool -y", shell=True)
                 case_num = raw_input("Please enter the case number you wish to upload this mapping to: ")
-                command = "redhat-support-tool addattachment -c " + case_num + " /tmp/gps.tar.gz"
+                command = "redhat-support-tool addattachment -c " + case_num + DIR + FILE_NAME 
                 p = subprocess.Popen(command, shell=True)
                 p.wait()
                 if p.returncode == 0:
-                    os.remove('/tmp/gps.tar.gz')
+                    os.remove(DIR + FILE_NAME)
                 break
 		else:
 		    print("There appears to be an issue with uploading the Satellite mapping to the case. Please "
