@@ -8,6 +8,7 @@ import shutil
 import getpass
 import argparse
 import subprocess
+import yum
 
 # Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
@@ -163,14 +164,28 @@ class ApiCall(object):
             shutil.rmtree(PATH)
 
     def rhst_upload(self):
+        # Use case 01979320 for testing
         option = raw_input("Would you like to upload this file to your case? [Y/N]:\n(Please note this will require "
                            "installing the redhat-support-tool if you do not already have it installed)\n")
         while True:
             if option.upper() == 'Y':
+                yb = yum.YumBase()
+                if yb.rpmdb.searchNevra(name='redhat-support-tool'):
+                    print "redhat-support-tool installed!"
+                else:
+                    print "redhat-support-tool not installed"
+                    print "installing redhat-support-tool..."
+                    subprocess.Popen("yum install redhat-support-tool -y", shell=True)
                 case_num = raw_input("Please enter the case number you wish to upload this mapping to: ")
                 command = "redhat-support-tool addattachment -c " + case_num + " /tmp/gps.tar.gz"
-                subprocess.Popen(command, shell=True)
+                p = subprocess.Popen(command, shell=True)
+                p.wait()
+                if p.returncode == 0:
+                    os.remove('/tmp/gps.tar.gz')
                 break
+		else:
+		    print("There appears to be an issue with uploading the Satellite mapping to the case. Please "
+                          "upload the file manually to the case through the customer portal.")
             elif option.upper() == 'N':
                 break
             else:
