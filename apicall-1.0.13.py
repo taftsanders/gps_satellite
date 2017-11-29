@@ -13,7 +13,9 @@ import yum
 # Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
 
-PATH = '/tmp/gps/'
+FULL_PATH = '/tmp/gps/'
+DIR = '/tmp/'
+FILE_NAME = 'gps.tar.gz'
 
 
 class ApiCall(object):
@@ -142,9 +144,9 @@ class ApiCall(object):
         ret = s.get(self.hostname + call, auth=s.auth, verify=False)
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
-                if not os.path.exists(PATH):
-                    os.makedirs(PATH)
-                    os.chdir(PATH)
+                if not os.path.exists(FULL_PATH):
+                    os.makedirs(FULL_PATH)
+                    os.chdir(FULL_PATH)
                 fw = open(name + '.json', 'w')
                 content = ret.content
                 fw.write(content)
@@ -156,12 +158,12 @@ class ApiCall(object):
 
     # Tar gz all files collected from GPS
     def clean_up(self):
-        os.chdir('/tmp/')
-        tar = tarfile.open("gps.tar.gz", "w:gz")
-        tar.add(PATH, arcname='.')
+        os.chdir(DIR)
+        tar = tarfile.open(FILE_NAME, "w:gz")
+        tar.add(FULL_PATH, arcname='.')
         tar.close()
-        if os.path.exists('/tmp/gps.tar.gz'):
-            shutil.rmtree(PATH)
+        if os.path.exists(DIR + FILE_NAME):
+            shutil.rmtree(FULL_PATH)
 
     def rhst_upload(self):
         # Use case 01979320 for testing
