@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from requests import Session
+from requests.exceptions import ConnectionError
 import requests
 import warnings
 import tarfile
@@ -19,7 +21,8 @@ FILE_NAME = 'gps.tar.gz'
 
 
 class ApiCall(object):
-    def __init__(self):
+
+    def __init__(self, hostname=None, username=None):
         """Initializing needed variables and lists for all api calls
 
         hostname = FQDN or ip address of the Satellite server
@@ -41,13 +44,26 @@ class ApiCall(object):
         hosts_id_list = initial collection of of hosts ids
         smart_variable_id_list = initial collection of smart variable ids
         """
-        self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
-        self.sat_admin = raw_input("Please enter the Satellite admin username: ")
+
+        # get username
+        if username:
+            self.sat_admin = username
+        else:
+            self.sat_admin = raw_input("Please enter the Satellite admin username: ")
+
+        if hostname:
+            self.hostname = "http://" + hostname
+        else:
+            self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
         #self.hostname = "http://batmaan.usersys.redhat.com"
         #self.sat_admin = "admin"
         #self.sat_pw = "vector16"
-        requests.Session()
+        #self.information()
+        self.session = Session()
+        self.session.auth = (self.sat_admin, self.sat_pw) 
+        self.session.verify = False
         self.org_id_list = []
         self.lifecycle_id_list = []
         self.cap_id_list = []
@@ -67,12 +83,10 @@ class ApiCall(object):
     def organization_id_list(self):
         """Collect organization ids."""
         try:
-            org_list_ret = requests.get(self.hostname + '/katello/api/organizations',
-                                        auth=(self.sat_admin, self.sat_pw), verify=False)
-            org_list = org_list_ret.json()
+            org_list = self.session.get(self.hostname + '/katello/api/organizations').json()
             for x in org_list['results']:
                 self.org_id_list.append(x['id'])
-        except (requests.exceptions.ConnectionError, KeyError):
+        except (ConnectionError, KeyError):
             print("Looks like the hostname/IP is incorrect, and/or the username/password is incorrect. Please double check"
                   " these entries and try again.")
             self.__init__()
@@ -80,10 +94,8 @@ class ApiCall(object):
     # Capsule id loop to gather all capsule id's for additional api calls
     def capsule_id_list(self):
         """MAKE A DOCSTRING"""
-        capsule_list_ret = requests.get(self.hostname + '/katello/api/capsules',
-                                        auth=(self.sat_admin, self.sat_pw), verify=False)
-        cap_list = capsule_list_ret.json()
-        for x in cap_list['results']:
+        capsule_list = self.session.get(self.hostname + '/katello/api/capsules').json()
+        for x in capsule_list['results']:
             self.cap_id_list.append(x['id'])
 
     # Lifecycle env. id loop to gather all lce id's for additional information
@@ -139,9 +151,7 @@ class ApiCall(object):
 
     # API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
-        s = requests.Session()
-        s.auth = (self.sat_admin, self.sat_pw)
-        ret = s.get(self.hostname + call, auth=s.auth, verify=False)
+        ret = self.session.get(self.hostname + call)
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
                 if not os.path.exists(FULL_PATH):
@@ -184,7 +194,7 @@ class ApiCall(object):
                 p.wait()
                 if p.returncode == 0:
                     os.remove(DIR + FILE_NAME)
-                break
+                    break
 		else:
 		    print("There appears to be an issue with uploading the Satellite mapping to the case. Please "
                           "upload the file manually to the case through the customer portal.")
@@ -618,7 +628,7 @@ class ApiCall(object):
             self.search("/api/smart_variables/" + str(i) + "/override_values", "override_values_sv" + str(i))
 
 def main():
-    a = ApiCall()
+    #a = ApiCall()
     parser = argparse.ArgumentParser()
     parser.add_argument("-a",
                         "--all",
@@ -628,7 +638,18 @@ def main():
                         "--errata", 
                         help="Collect errata only, this could take a while based on the repos you have enabled",
                         action="store_true")
+    parser.add_argument("-u",
+                        "--username", 
+                        dest="username",
+                        help="Enter your username")
+    parser.add_argument("-d",
+                        "--destination",
+                        dest="hostname",
+                        help="Set the hostname for the Satellite server")
     args = parser.parse_args()
+
+    a = ApiCall(args.hostname, args.username)
+
     # Call all functions
     if args.all:
         ###########################
