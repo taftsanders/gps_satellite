@@ -2,7 +2,6 @@
 
 from requests import Session
 from requests.exceptions import ConnectionError
-import requests
 import warnings
 import tarfile
 import os
@@ -22,19 +21,12 @@ FILE_NAME = 'gps.tar.gz'
 
 class ApiCall(object):
 
-    def __init__(self, hostname=None, username=None):
+    def __init__(self, hostname=None, username=None, password=None):
         """Initializing needed variables and lists for all api calls
 
         hostname = FQDN or ip address of the Satellite server
         sat_admin = admin user of the Satellite
         sat_pw = password for the admin user
-        org_id_list = list of ids for all orgs
-        lifecycle_id_list = list of ids for all lce
-        cap_id_list = list of ids for all capsules
-        compute_res_id_list = list of ids for all computer resources
-        contentview_id = list of ids for all content views
-        hosts_id = list of ids for all hosts
-        smart_variable_id = list of ids for all smart variables
         information = function to gather hostname, admin user, and password from user
         organization_id_list = initial collection of organization ids
         capsule_id_list = initial collection of capsule ids
@@ -44,33 +36,28 @@ class ApiCall(object):
         hosts_id_list = initial collection of of hosts ids
         smart_variable_id_list = initial collection of smart variable ids
         """
-
         # get username
         if username:
             self.sat_admin = username
         else:
             self.sat_admin = raw_input("Please enter the Satellite admin username: ")
 
+        # get hostname
         if hostname:
             self.hostname = "http://" + hostname
         else:
             self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
 
-        self.sat_pw = getpass.getpass("Please enter the password of this user: ")
-        #self.hostname = "http://batmaan.usersys.redhat.com"
-        #self.sat_admin = "admin"
-        #self.sat_pw = "vector16"
-        #self.information()
+        # get password
+        if password:
+            self.sat_pw = password
+        else:
+            self.sat_pw = getpass.getpass("Please enter the password of this user: ")
+
         self.session = Session()
+        self.__connection_test()
         self.session.auth = (self.sat_admin, self.sat_pw) 
         self.session.verify = False
-        self.org_id_list = []
-        self.lifecycle_id_list = []
-        self.cap_id_list = []
-        self.compute_res_id_list = []
-        self.contentview_id = []
-        self.hosts_id = []
-        self.smart_variable_id = []
         self.organization_id_list()
         self.capsule_id_list()
         self.lce_id_list()
@@ -79,21 +66,33 @@ class ApiCall(object):
         self.hosts_id_list()
         self.smart_variable_id_list()
 
+    def information(self):
+        self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+        self.sat_admin = raw_input("Please enter the Satellite admin username: ")
+        self.sat_pw = getpass.getpass("Please enter the password of this user: ")
+
+    def __connection_test(self):
+        try:
+            ret = self.session.get(self.hostname + '/katello/api/organizations')
+        except KeyError:
+            print("Incorrect Username or Password given, please try again")
+            self.information()
+        except ConnectionError:
+            print("Incorrect URL given, please try again")
+            self.information()
+
     # Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
         """Collect organization ids."""
-        try:
-            org_list = self.session.get(self.hostname + '/katello/api/organizations').json()
-            for x in org_list['results']:
-                self.org_id_list.append(x['id'])
-        except (ConnectionError, KeyError):
-            print("Looks like the hostname/IP is incorrect, and/or the username/password is incorrect. Please double check"
-                  " these entries and try again.")
-            self.__init__()
+        self.org_id_list = []
+        org_list = self.session.get(self.hostname + '/katello/api/organizations').json()
+        for x in org_list['results']:
+            self.org_id_list.append(x['id'])
 
     # Capsule id loop to gather all capsule id's for additional api calls
     def capsule_id_list(self):
         """MAKE A DOCSTRING"""
+        self.cap_id_list =[]
         capsule_list = self.session.get(self.hostname + '/katello/api/capsules').json()
         for x in capsule_list['results']:
             self.cap_id_list.append(x['id'])
@@ -101,57 +100,49 @@ class ApiCall(object):
     # Lifecycle env. id loop to gather all lce id's for additional information
     def lce_id_list(self):
         """MAKE A DOCSTRING"""
+        self.lifecycle_id_list = []
         for x in self.org_id_list:
-            lce_list_ret = requests.get(self.hostname + '/katello/api/organizations/' + str(x) + '/environments',
-                                        auth=(self.sat_admin, self.sat_pw), verify=False)
-            lce_list = lce_list_ret.json()
+            lce_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/environments').json()
             for i in lce_list['results']:
                 self.lifecycle_id_list.append(i['id'])
 
     # Compute resource id loop to gather all compute resource id's for additional information
     def compute_resource_id_list(self):
         """MAKE A DOCSTRING"""
-        compute_resource_list_ret = requests.get(self.hostname + '/api/compute_resources',
-                                                 auth=(self.sat_admin, self.sat_pw), verify=False)
-        compute_res_list = compute_resource_list_ret.json()
+        self.compute_res_id_list = []
+        compute_res_list = self.session.get(self.hostname + '/api/compute_resources').json()
         for x in compute_res_list['results']:
             self.compute_res_id_list.append(x['id'])
 
     # Content view id loop to gather all content view id's for additional information
     def contentview_id_list(self):
         """MAKE A DOCSTRING"""
+        self.contentview_id = []
         for x in self.org_id_list:
-            cv_list_ret = requests.get(self.hostname + '/katello/api/organizations/' + str(x) + '/content_views',
-                                       auth=(self.sat_admin, self.sat_pw), verify=False)
-            cv_list = cv_list_ret.json()
+            cv_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/content_views').json()
             for i in cv_list['results']:
                 self.contentview_id.append(i['id'])
 
-            # Host id loop to gather all host id's for additional information
-
+    # Host id loop to gather all host id's for additional information
     def hosts_id_list(self):
         """MAKE A DOCSTRING"""
+        self.hosts_id = []
         for x in self.org_id_list:
-            host_list_ret = requests.get(self.hostname + '/api/organizations/' + str(x) + '/hosts',
-                                         auth=(self.sat_admin, self.sat_pw), verify=False)
-            host_list = host_list_ret.json()
+            host_list = self.session.get(self.hostname + '/api/organizations/' + str(x) + '/hosts').json()
             for i in host_list['results']:
                 self.hosts_id.append(i['id'])
 
     # Smart variable id loop to gather all smart variable id's for additional information
     def smart_variable_id_list(self):
         """MAKE A DOCSTRING"""
-        smart_variable_list_ret = requests.get(self.hostname + '/api/smart_variables',
-                                               auth=(self.sat_admin, self.sat_pw), verify=False)
-        smart_variable_list = smart_variable_list_ret.json()
+        self.smart_variable_id = []
+        smart_variable_list = self.session.get(self.hostname + '/api/smart_variables').json()
         for x in smart_variable_list['results']:
             self.smart_variable_id.append(x['id'])
 
-
-
     # API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
-        ret = self.session.get(self.hostname + call)
+        ret = self.session.get(self.hostname + call + '?per_page=20')
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
                 if not os.path.exists(FULL_PATH):
@@ -235,7 +226,7 @@ class ApiCall(object):
     def errata_list(self):
         print("Gathering all Errata synced on the Satellite")
         print("**This may take a while**")
-        self.search("/katello/api/errata?per_page=20", "errata_list")
+        self.search("/katello/api/errata", "errata_list")
 
     # Gather all openscap policies on the Satellite
     def openscap_policy_list(self):
@@ -628,196 +619,203 @@ class ApiCall(object):
             self.search("/api/smart_variables/" + str(i) + "/override_values", "override_values_sv" + str(i))
 
 def main():
-    #a = ApiCall()
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-a",
-                        "--all",
-                        help="run all apicalls from Satellite (This could take a while)",
-                        action="store_true")
-    parser.add_argument("-e",
-                        "--errata", 
-                        help="Collect errata only, this could take a while based on the repos you have enabled",
-                        action="store_true")
-    parser.add_argument("-u",
-                        "--username", 
-                        dest="username",
-                        help="Enter your username")
-    parser.add_argument("-d",
-                        "--destination",
-                        dest="hostname",
-                        help="Set the hostname for the Satellite server")
-    args = parser.parse_args()
 
-    a = ApiCall(args.hostname, args.username)
+    if os.geteuid == 0:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-a",
+                            "--all",
+                            help="run all apicalls from Satellite (This could take a while)",
+                            action="store_true")
+        parser.add_argument("-e",
+                            "--errata",
+                            help="Collect errata only, this could take a while based on the repos you have enabled",
+                            action="store_true")
+        parser.add_argument("-u",
+                            "--username",
+                            dest="username",
+                            help="Enter your username")
+        parser.add_argument("-d",
+                            "--destination",
+                            dest="hostname",
+                            help="Set the hostname for the Satellite server")
+        parser.add_argument("-p",
+                            "--password",
+                            dest="password",
+                            help="Set the password for the Satellite server")
+        args = parser.parse_args()
 
-    # Call all functions
-    if args.all:
-        ###########################
-        #####INDEPENDENT CALLS#####
-        ###########################
-        a.organization_list()
-        a.location_list()
-        a.capsule_list()
-        a.dashboard_details()
-        a.domain_list()
-        a.errata_list()
-        a.openscap_policy_list()
-        a.satellite_tasks_summary()
-        a.hammer_ping()
-        a.realms_list()
-        a.user_roles_list()
-        a.settings_list()
-        a.subnets_list()
-        a.user_list()
-        a.arch_list()
-        a.audit_list()
-        a.autosign_list()
-        a.bookmark_list()
-        a.common_parameters_list()
-        a.compute_profiles()
-        a.compute_resources()
-        a.config_groups()
-        a.config_reports()
-        a.config_templates()
-        a.containers_list()
-        a.discovered_hosts()
-        a.discovery_rules()
-        a.user_role_filters()
-        a.arf_reports()
-        a.openscap_contents()
-        a.gpgkey_list()
-        a.rex_history_list()
-        a.os_list()
-        a.ostree_branches_list()
-        a.permissions_list()
-        a.recurring_logics()
-        a.docker_registries()
-        a.rex_features_list()
-        a.reports_list()
-        a.smart_proxy_list()
-        a.smart_variables_list()
-        a.statistics()
-        a.template_kind_list()
-        a.usergroup_list()
-        a.contentview_filters()
-        a.contentview_versions()
-        a.docker_manifests()
-        a.docker_tags()
-        a.fact_values()
-        #############################
-        #####DEPENDENT CALLS#########
-        #############################
-        a.activation_key_list()
-        a.auth_source_ldap_list()
-        a.content_views_list()
-        a.puppet_environments_list()
-        a.host_collection_list()
-        a.hostgroups_list()
-        a.hosts_lists()
-        a.rex_templates_list()
-        a.lce_list()
-        a.media_list()
-        a.products_list()
-        a.provisioning_templates_list()
-        a.partition_tables_list()
-        a.subscription_list()
-        a.manifest_history()
-        a.sync_plan_list()
-        a.uebercert_list()
-        a.capsule_lce_assigned_list()
-        a.capsule_lce_available_list()
-        a.capsule_sync_status_list()
-        a.cr_avail_img_list()
-        a.cv_filter_list()
-        a.cv_history_list()
-        a.cv_puppet_modules_list()
-        a.override_values_list()
-        a.clean_up()
-    elif args.errata:
-        a.errata_list()
-        a.clean_up()
-        a.rhst_upload()
+        a = ApiCall(args.hostname, args.username, args.password)
+
+        # Call all functions
+        if args.all:
+            ###########################
+            #####INDEPENDENT CALLS#####
+            ###########################
+            a.organization_list()
+            a.location_list()
+            a.capsule_list()
+            a.dashboard_details()
+            a.domain_list()
+            a.errata_list()
+            a.openscap_policy_list()
+            a.satellite_tasks_summary()
+            a.hammer_ping()
+            a.realms_list()
+            a.user_roles_list()
+            a.settings_list()
+            a.subnets_list()
+            a.user_list()
+            a.arch_list()
+            a.audit_list()
+            a.autosign_list()
+            a.bookmark_list()
+            a.common_parameters_list()
+            a.compute_profiles()
+            a.compute_resources()
+            a.config_groups()
+            a.config_reports()
+            a.config_templates()
+            a.containers_list()
+            a.discovered_hosts()
+            a.discovery_rules()
+            a.user_role_filters()
+            a.arf_reports()
+            a.openscap_contents()
+            a.gpgkey_list()
+            a.rex_history_list()
+            a.os_list()
+            a.ostree_branches_list()
+            a.permissions_list()
+            a.recurring_logics()
+            a.docker_registries()
+            a.rex_features_list()
+            a.reports_list()
+            a.smart_proxy_list()
+            a.smart_variables_list()
+            a.statistics()
+            a.template_kind_list()
+            a.usergroup_list()
+            a.contentview_filters()
+            a.contentview_versions()
+            a.docker_manifests()
+            a.docker_tags()
+            a.fact_values()
+            #############################
+            #####DEPENDENT CALLS#########
+            #############################
+            a.activation_key_list()
+            a.auth_source_ldap_list()
+            a.content_views_list()
+            a.puppet_environments_list()
+            a.host_collection_list()
+            a.hostgroups_list()
+            a.hosts_lists()
+            a.rex_templates_list()
+            a.lce_list()
+            a.media_list()
+            a.products_list()
+            a.provisioning_templates_list()
+            a.partition_tables_list()
+            a.subscription_list()
+            a.manifest_history()
+            a.sync_plan_list()
+            a.uebercert_list()
+            a.capsule_lce_assigned_list()
+            a.capsule_lce_available_list()
+            a.capsule_sync_status_list()
+            a.cr_avail_img_list()
+            a.cv_filter_list()
+            a.cv_history_list()
+            a.cv_puppet_modules_list()
+            a.override_values_list()
+            a.clean_up()
+        elif args.errata:
+            a.errata_list()
+            a.clean_up()
+            a.rhst_upload()
+        else:
+            ###########################
+            #####INDEPENDENT CALLS#####
+            ###########################
+            a.organization_list()
+            a.location_list()
+            a.capsule_list()
+            a.dashboard_details()
+            a.domain_list()
+            a.openscap_policy_list()
+            a.satellite_tasks_summary()
+            a.hammer_ping()
+            a.realms_list()
+            a.user_roles_list()
+            a.settings_list()
+            a.subnets_list()
+            a.user_list()
+            a.arch_list()
+            a.audit_list()
+            a.autosign_list()
+            a.bookmark_list()
+            a.common_parameters_list()
+            a.compute_profiles()
+            a.compute_resources()
+            a.config_groups()
+            a.config_reports()
+            a.config_templates()
+            a.containers_list()
+            a.discovered_hosts()
+            a.discovery_rules()
+            a.user_role_filters()
+            a.arf_reports()
+            a.openscap_contents()
+            a.gpgkey_list()
+            a.rex_history_list()
+            a.os_list()
+            a.ostree_branches_list()
+            a.permissions_list()
+            a.recurring_logics()
+            a.docker_registries()
+            a.rex_features_list()
+            a.reports_list()
+            a.smart_proxy_list()
+            a.smart_variables_list()
+            a.statistics()
+            a.template_kind_list()
+            a.usergroup_list()
+            a.contentview_filters()
+            a.contentview_versions()
+            a.docker_manifests()
+            a.docker_tags()
+            a.fact_values()
+            #############################
+            #####DEPENDENT CALLS#########
+            #############################
+            a.activation_key_list()
+            a.auth_source_ldap_list()
+            a.content_views_list()
+            a.puppet_environments_list()
+            a.host_collection_list()
+            a.hostgroups_list()
+            a.hosts_lists()
+            a.rex_templates_list()
+            a.lce_list()
+            a.media_list()
+            a.products_list()
+            a.provisioning_templates_list()
+            a.partition_tables_list()
+            a.subscription_list()
+            a.manifest_history()
+            a.sync_plan_list()
+            a.uebercert_list()
+            a.capsule_lce_assigned_list()
+            a.capsule_lce_available_list()
+            a.capsule_sync_status_list()
+            a.cr_avail_img_list()
+            a.cv_filter_list()
+            a.cv_history_list()
+            a.cv_puppet_modules_list()
+            a.override_values_list()
+            a.clean_up()
     else:
-        ###########################
-        #####INDEPENDENT CALLS#####
-        ###########################
-        a.organization_list()
-        a.location_list()
-        a.capsule_list()
-        a.dashboard_details()
-        a.domain_list()
-        a.openscap_policy_list()
-        a.satellite_tasks_summary()
-        a.hammer_ping()
-        a.realms_list()
-        a.user_roles_list()
-        a.settings_list()
-        a.subnets_list()
-        a.user_list()
-        a.arch_list()
-        a.audit_list()
-        a.autosign_list()
-        a.bookmark_list()
-        a.common_parameters_list()
-        a.compute_profiles()
-        a.compute_resources()
-        a.config_groups()
-        a.config_reports()
-        a.config_templates()
-        a.containers_list()
-        a.discovered_hosts()
-        a.discovery_rules()
-        a.user_role_filters()
-        a.arf_reports()
-        a.openscap_contents()
-        a.gpgkey_list()
-        a.rex_history_list()
-        a.os_list()
-        a.ostree_branches_list()
-        a.permissions_list()
-        a.recurring_logics()
-        a.docker_registries()
-        a.rex_features_list()
-        a.reports_list()
-        a.smart_proxy_list()
-        a.smart_variables_list()
-        a.statistics()
-        a.template_kind_list()
-        a.usergroup_list()
-        a.contentview_filters()
-        a.contentview_versions()
-        a.docker_manifests()
-        a.docker_tags()
-        a.fact_values()
-        #############################
-        #####DEPENDENT CALLS#########
-        #############################
-        a.activation_key_list()
-        a.auth_source_ldap_list()
-        a.content_views_list()
-        a.puppet_environments_list()
-        a.host_collection_list()
-        a.hostgroups_list()
-        a.hosts_lists()
-        a.rex_templates_list()
-        a.lce_list()
-        a.media_list()
-        a.products_list()
-        a.provisioning_templates_list()
-        a.partition_tables_list()
-        a.subscription_list()
-        a.manifest_history()
-        a.sync_plan_list()
-        a.uebercert_list()
-        a.capsule_lce_assigned_list()
-        a.capsule_lce_available_list()
-        a.capsule_sync_status_list()
-        a.cr_avail_img_list()
-        a.cv_filter_list()
-        a.cv_history_list()
-        a.cv_puppet_modules_list()
-        a.override_values_list()
-        a.clean_up()
+        print("Please run as the root user.")
 
 
 
