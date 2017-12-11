@@ -10,6 +10,7 @@ import getpass
 import argparse
 import subprocess
 import yum
+import pdb
 
 # Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
@@ -66,14 +67,16 @@ class ApiCall(object):
         self.hosts_id_list()
         self.smart_variable_id_list()
 
+    # Fallback for Satellite information
     def information(self):
         self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
+    # Test Satellite connectivity with user and password
     def __connection_test(self):
         try:
-            ret = self.session.get(self.hostname + '/katello/api/organizations')
+            self.session.get(self.hostname + '/katello/api/organizations')
         except KeyError:
             print("Incorrect Username or Password given, please try again")
             self.information()
@@ -91,7 +94,7 @@ class ApiCall(object):
 
     # Capsule id loop to gather all capsule id's for additional api calls
     def capsule_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collection of capsule ids."""
         self.cap_id_list =[]
         capsule_list = self.session.get(self.hostname + '/katello/api/capsules').json()
         for x in capsule_list['results']:
@@ -99,7 +102,7 @@ class ApiCall(object):
 
     # Lifecycle env. id loop to gather all lce id's for additional information
     def lce_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collection of lifecycle environment ids"""
         self.lifecycle_id_list = []
         for x in self.org_id_list:
             lce_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/environments').json()
@@ -108,7 +111,7 @@ class ApiCall(object):
 
     # Compute resource id loop to gather all compute resource id's for additional information
     def compute_resource_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collection of compute resource ids"""
         self.compute_res_id_list = []
         compute_res_list = self.session.get(self.hostname + '/api/compute_resources').json()
         for x in compute_res_list['results']:
@@ -116,7 +119,7 @@ class ApiCall(object):
 
     # Content view id loop to gather all content view id's for additional information
     def contentview_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collection of content view ids"""
         self.contentview_id = []
         for x in self.org_id_list:
             cv_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/content_views').json()
@@ -125,7 +128,7 @@ class ApiCall(object):
 
     # Host id loop to gather all host id's for additional information
     def hosts_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collection of host ids"""
         self.hosts_id = []
         for x in self.org_id_list:
             host_list = self.session.get(self.hostname + '/api/organizations/' + str(x) + '/hosts').json()
@@ -134,7 +137,7 @@ class ApiCall(object):
 
     # Smart variable id loop to gather all smart variable id's for additional information
     def smart_variable_id_list(self):
-        """MAKE A DOCSTRING"""
+        """Collection of smart variable ids"""
         self.smart_variable_id = []
         smart_variable_list = self.session.get(self.hostname + '/api/smart_variables').json()
         for x in smart_variable_list['results']:
@@ -142,7 +145,8 @@ class ApiCall(object):
 
     # API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
-        ret = self.session.get(self.hostname + call + '?per_page=20')
+        """Request API queried information"""
+        ret = self.session.get(self.hostname + call + '?per_page=2000000')
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
                 if not os.path.exists(FULL_PATH):
@@ -159,6 +163,7 @@ class ApiCall(object):
 
     # Tar gz all files collected from GPS
     def clean_up(self):
+        """Archive all collected data"""
         os.chdir(DIR)
         tar = tarfile.open(FILE_NAME, "w:gz")
         tar.add(FULL_PATH, arcname='.')
@@ -166,8 +171,10 @@ class ApiCall(object):
         if os.path.exists(DIR + FILE_NAME):
             shutil.rmtree(FULL_PATH)
 
+    # Upload the tar'ed Satellite mapping to the case using the RHST
+    # Use case 01979320 for testing
     def rhst_upload(self):
-        # Use case 01979320 for testing
+        """Upload mapping to case with RHST"""
         option = raw_input("Would you like to upload this file to your case? [Y/N]:\n(Please note this will require "
                            "installing the redhat-support-tool if you do not already have it installed)\n")
         while True:
@@ -178,24 +185,25 @@ class ApiCall(object):
                 else:
                     print "redhat-support-tool not installed"
                     print "installing redhat-support-tool..."
-                    subprocess.Popen("yum install redhat-support-tool -y", shell=True)
+                    a = subprocess.Popen("yum install redhat-support-tool -y", shell=True)
+                    a.wait()
                 case_num = raw_input("Please enter the case number you wish to upload this mapping to: ")
-                command = "redhat-support-tool addattachment -c " + case_num + DIR + FILE_NAME 
+                command = "redhat-support-tool addattachment -c " + case_num + " " + DIR + FILE_NAME
                 p = subprocess.Popen(command, shell=True)
                 p.wait()
                 if p.returncode == 0:
                     os.remove(DIR + FILE_NAME)
                     break
-		else:
-		    print("There appears to be an issue with uploading the Satellite mapping to the case. Please "
+                else:
+                    print("There appears to be an issue with uploading the Satellite mapping to the case. Please "
                           "upload the file manually to the case through the customer portal.")
             elif option.upper() == 'N':
+                print("Please upload " + DIR + FILE_NAME + " to your case.")
                 break
             else:
                 print("ERROR: INCORRECT VALUE ENTERED")
                 option = raw_input("Please enter a valid selection: 'Y' for yes or 'N' for no: ")
                 option.upper()
-
 
     # Gather all Satellite organizations
     def organization_list(self):
@@ -618,9 +626,9 @@ class ApiCall(object):
             print("Gathering override values for smart variable id: " + str(i))
             self.search("/api/smart_variables/" + str(i) + "/override_values", "override_values_sv" + str(i))
 
-def main():
 
-    if os.geteuid == 0:
+def main():
+    if os.geteuid() == 0:
         parser = argparse.ArgumentParser()
         parser.add_argument("-a",
                             "--all",
@@ -646,7 +654,6 @@ def main():
 
         a = ApiCall(args.hostname, args.username, args.password)
 
-        # Call all functions
         if args.all:
             ###########################
             #####INDEPENDENT CALLS#####
@@ -729,6 +736,7 @@ def main():
             a.cv_puppet_modules_list()
             a.override_values_list()
             a.clean_up()
+            a.rhst_upload()
         elif args.errata:
             a.errata_list()
             a.clean_up()
@@ -814,6 +822,7 @@ def main():
             a.cv_puppet_modules_list()
             a.override_values_list()
             a.clean_up()
+            a.rhst_upload()
     else:
         print("Please run as the root user.")
 
