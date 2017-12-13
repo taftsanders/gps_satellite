@@ -3,6 +3,7 @@
 from requests import Session
 from requests.exceptions import ConnectionError
 import warnings
+import datetime
 import tarfile
 import os
 import shutil
@@ -17,7 +18,8 @@ warnings.filterwarnings("ignore")
 
 FULL_PATH = '/tmp/gps/'
 DIR = '/tmp/'
-FILE_NAME = 'gps.tar.gz'
+FILE_NAME = 'gps-' + datetime.datetime.now().isoformat() + '.tar.gz'
+
 
 
 class ApiCall(object):
