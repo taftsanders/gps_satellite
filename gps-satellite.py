@@ -12,7 +12,7 @@ import argparse
 import subprocess
 import yum
 
-# Suppress all warnings. COMMENT OUT FOR DEBUG
+# Suppress all warnings. COMMENT OUT FOR WARNINGS
 warnings.filterwarnings("ignore")
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -38,17 +38,17 @@ class ApiCall(object):
         hosts_id_list = initial collection of of hosts ids
         smart_variable_id_list = initial collection of smart variable ids
         """
-        # get username
-        if username:
-            self.sat_admin = username
-        else:
-            self.sat_admin = raw_input("Please enter the Satellite admin username: ")
-
         # get hostname
         if hostname:
             self.hostname = "http://" + hostname
         else:
             self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+
+        # get username
+        if username:
+            self.sat_admin = username
+        else:
+            self.sat_admin = raw_input("Please enter the Satellite admin username: ")
 
         # get password
         if password:
@@ -57,10 +57,9 @@ class ApiCall(object):
             self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
         self.session = Session()
-        self.__connection_test()
-        self.session.auth = (self.sat_admin, self.sat_pw) 
+        self.session.auth = (self.sat_admin, self.sat_pw)
         self.session.verify = False
-        self.organization_id_list()
+        self.__connection_test()
         self.capsule_id_list()
         self.lce_id_list()
         self.compute_resource_id_list()
@@ -76,19 +75,20 @@ class ApiCall(object):
 
     # Test Satellite connectivity with user and password
     def __connection_test(self):
-        try:
-            self.session.get(self.hostname + '/katello/api/organizations')
-        except KeyError:
-            print("Incorrect Username or Password given, please try again")
-            self.information()
-        except ConnectionError:
-            print("Incorrect URL given, please try again")
-            self.information()
+            try:
+                self.organization_id_list()
+            except KeyError:
+                print("Incorrect Username or Password given, please try again")
+                self.information()
+            except (ConnectionError, ValueError):
+                print("Incorrect URL given, please try again")
+                self.information()
 
     # Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
         """Collect organization ids."""
         self.org_id_list = []
+        print("Initializing Organization list")
         org_list = self.session.get(self.hostname + '/katello/api/organizations').json()
         for x in org_list['results']:
             self.org_id_list.append(x['id'])
@@ -97,6 +97,7 @@ class ApiCall(object):
     def capsule_id_list(self):
         """Collection of capsule ids."""
         self.cap_id_list =[]
+        print("Initializing Capsule list")
         capsule_list = self.session.get(self.hostname + '/katello/api/capsules').json()
         for x in capsule_list['results']:
             self.cap_id_list.append(x['id'])
@@ -105,6 +106,7 @@ class ApiCall(object):
     def lce_id_list(self):
         """Collection of lifecycle environment ids"""
         self.lifecycle_id_list = []
+        print("Initializing Lifecycle Environment list")
         for x in self.org_id_list:
             lce_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/environments').json()
             for i in lce_list['results']:
@@ -114,6 +116,7 @@ class ApiCall(object):
     def compute_resource_id_list(self):
         """Collection of compute resource ids"""
         self.compute_res_id_list = []
+        print("Initializing Compute Resource list")
         compute_res_list = self.session.get(self.hostname + '/api/compute_resources').json()
         for x in compute_res_list['results']:
             self.compute_res_id_list.append(x['id'])
@@ -122,6 +125,7 @@ class ApiCall(object):
     def contentview_id_list(self):
         """Collection of content view ids"""
         self.contentview_id = []
+        print("Initializing Content view list list")
         for x in self.org_id_list:
             cv_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/content_views').json()
             for i in cv_list['results']:
@@ -131,6 +135,7 @@ class ApiCall(object):
     def hosts_id_list(self):
         """Collection of host ids"""
         self.hosts_id = []
+        print("Initializing Host list")
         for x in self.org_id_list:
             host_list = self.session.get(self.hostname + '/api/organizations/' + str(x) + '/hosts').json()
             for i in host_list['results']:
@@ -140,6 +145,7 @@ class ApiCall(object):
     def smart_variable_id_list(self):
         """Collection of smart variable ids"""
         self.smart_variable_id = []
+        print("Initializing Puppet Smart Variable list")
         smart_variable_list = self.session.get(self.hostname + '/api/smart_variables').json()
         for x in smart_variable_list['results']:
             self.smart_variable_id.append(x['id'])
@@ -633,7 +639,7 @@ def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("-a",
                             "--all",
-                            help="run all apicalls from Satellite (This could take a while)",
+                            help="Run all API calls from Satellite (This includes all options and will take a while)",
                             action="store_true")
         parser.add_argument("-e",
                             "--errata",
@@ -651,6 +657,16 @@ def main():
                             "--password",
                             dest="password",
                             help="Set the password for the Satellite server")
+        parser.add_argument("--content-view",
+                            help="Collect API calls relevant to content view information",
+                            action="store_true")
+        parser.add_argument("--provision",
+                            help="Collect API calls relevant to provisioning information",
+                            action="store_true")
+        parser.add_argument("-t",
+                            "--test",
+                            help="Test API call to the Satellite (organization call)",
+                            action="store_true")
         args = parser.parse_args()
 
         a = ApiCall(args.hostname, args.username, args.password)
@@ -740,6 +756,60 @@ def main():
             a.rhst_upload()
         elif args.errata:
             a.errata_list()
+            a.clean_up()
+            a.rhst_upload()
+        elif args.content_view:
+            a.organization_list()
+            a.location_list()
+            a.capsule_list()
+            a.errata_list()
+            a.hammer_ping()
+            a.user_roles_list()
+            a.user_list()
+            a.docker_registries()
+            a.contentview_filters()
+            a.contentview_versions()
+            a.activation_key_list()
+            a.content_views_list()
+            a.hosts_lists()
+            a.products_list()
+            a.subscription_list()
+            a.capsule_lce_assigned_list()
+            a.capsule_sync_status_list()
+            a.cv_filter_list()
+            a.cv_history_list()
+            a.cv_puppet_modules_list()
+            a.clean_up()
+            a.rhst_upload()
+        elif args.provision:
+            a.organization_list()
+            a.location_list()
+            a.capsule_list()
+            a.domain_list()
+            a.satellite_tasks_summary()
+            a.hammer_ping()
+            a.realms_list()
+            a.settings_list()
+            a.subnets_list()
+            a.arch_list()
+            a.compute_profiles()
+            a.compute_resources()
+            a.config_groups()
+            a.config_reports()
+            a.config_templates()
+            a.discovered_hosts()
+            a.discovery_rules()
+            a.os_list()
+            a.smart_proxy_list()
+            a.template_kind_list()
+            a.hostgroups_list()
+            a.media_list()
+            a.provisioning_templates_list()
+            a.partition_tables_list()
+            a.clean_up()
+            a.rhst_upload()
+        elif args.test:
+            a.organization_list()
             a.clean_up()
             a.rhst_upload()
         else:
