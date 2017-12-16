@@ -2,6 +2,7 @@
 
 from requests import Session
 from requests.exceptions import ConnectionError
+import pulp_api
 import warnings
 import datetime
 import tarfile
@@ -670,6 +671,7 @@ def main():
         args = parser.parse_args()
 
         a = ApiCall(args.hostname, args.username, args.password)
+        p = pulp_api.Pulp_api.get_task()
 
         if args.all:
             ###########################
@@ -810,6 +812,7 @@ def main():
             a.rhst_upload()
         elif args.test:
             a.organization_list()
+            p.get_task()
             a.clean_up()
             a.rhst_upload()
         else:
