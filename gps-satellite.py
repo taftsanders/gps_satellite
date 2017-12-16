@@ -15,10 +15,10 @@ import yum
 # Suppress all warnings. COMMENT OUT FOR DEBUG
 warnings.filterwarnings("ignore")
 
-FULL_PATH = '/tmp/gps/gps-satellite-' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + '/'
+DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+FULL_PATH = '/tmp/gps/gps-satellite-' + DATE + '/'
 DIR = '/tmp/'
-FILE_NAME = 'gps-satellite-' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + '.tar.gz'
-
+FILE_NAME = 'gps-satellite-' + DATE + '.tar.gz'
 
 
 class ApiCall(object):
