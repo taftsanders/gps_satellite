@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-
+import pulp_api as pulp
 from requests import Session
 from requests.exceptions import ConnectionError
-import pulp_api
 import warnings
 import datetime
 import tarfile
@@ -41,7 +40,7 @@ class ApiCall(object):
         """
         # get hostname
         if hostname:
-            self.hostname = "http://" + hostname
+            self.hostname = "https://" + hostname
         else:
             self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
 
@@ -671,7 +670,7 @@ def main():
         args = parser.parse_args()
 
         a = ApiCall(args.hostname, args.username, args.password)
-        p = pulp_api.Pulp_api.get_task()
+        b = pulp.Pulp_api(a.hostname, path=FULL_PATH)
 
         if args.all:
             ###########################
@@ -812,9 +811,10 @@ def main():
             a.rhst_upload()
         elif args.test:
             a.organization_list()
-            p.get_task()
+            b.get_task(FULL_PATH)
             a.clean_up()
             a.rhst_upload()
+
         else:
             ###########################
             #####INDEPENDENT CALLS#####
