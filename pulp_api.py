@@ -4,10 +4,9 @@ import os
 import pdb
 
 
-
 class Pulp_api():
 
-    def __init__(self,hostname=None, path=None):
+    def __init__(self, hostname=None, path=None):
         self.session = Session()
         command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
         command2 = ['cut', '-d', ' ', '-f2']
@@ -25,7 +24,6 @@ class Pulp_api():
 
     def search(self, call=None, name=None):
         """Request API queried information"""
-        #pdb.set_trace()
         ret = self.session.get(self.hostname + call + '?per_page=2000000')
         if ret.ok and ret.status_code == 200:
             if 'json' in ret.headers.get('Content-Type'):
@@ -43,4 +41,16 @@ class Pulp_api():
 
     def get_task(self, path):
         print("Gathering all Pulp tasks")
-        self.search("/pulp/api/v2/tasks/", "Pulp tasks")
+        self.search("/pulp/api/v2/tasks/", "Pulp_tasks")
+
+    def get_consumers(self, path):
+        print("Gathering all Pulp consumers")
+        self.search("/pulp/api/v2/consumers/", "Pulp_consumers")
+
+    def get_repositories(self, path):
+        print("Gathering all Pulp repositories")
+        self.search("/pulp/api/v2/repositories/", "Pulp_repositories")
+
+    def get_orphaned_repos(self, path):
+        print("Gathering all Orphaned Pulp repositories")
+        self.search("/pulp/api/v2/content/orphans/", "Orphaned_repositories")
