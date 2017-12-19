@@ -227,6 +227,11 @@ class ApiCall(object):
         print("Gathering all Capsule servers")
         self.search("/katello/api/capsules", "capsule_list")
 
+    #Gather all Smart Proxies information
+    def smart_proxies_list(self):
+        print("Gathering all Smart Proxies")
+        self.search("/api/smart_proxies", "smart_proxies")
+
     # Gather all reported information from the dashboard
     def dashboard_details(self):
         print("Gathering all Satellite Dashboard information")
@@ -725,6 +730,7 @@ def main():
             a.docker_manifests()
             a.docker_tags()
             a.fact_values()
+            a.smart_proxies_list()
             #############################
             #####DEPENDENT CALLS#########
             #############################
