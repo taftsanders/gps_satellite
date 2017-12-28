@@ -159,10 +159,9 @@ class ApiCall(object):
                 if not os.path.exists(FULL_PATH):
                     os.makedirs(FULL_PATH)
                     os.chdir(FULL_PATH)
-                fw = open(name + '.json', 'w')
-                content = ret.content
-                fw.write(content)
-                fw.close()
+                with open(name + '.json', 'w') as fw:
+                    content = ret.content
+                    fw.write(content)
             else:
                 return ret.text
         else:
@@ -172,9 +171,8 @@ class ApiCall(object):
     def clean_up(self):
         """Archive all collected data"""
         os.chdir(DIR)
-        tar = tarfile.open(FILE_NAME, "w:gz")
-        tar.add('/tmp/gps/', arcname='.')
-        tar.close()
+        with tarfile.open(FILE_NAME, "w:gz") as tar:
+            tar.add('/tmp/gps/', arcname='.')
         if os.path.exists(DIR + FILE_NAME):
             shutil.rmtree('/tmp/gps/')
 
@@ -818,6 +816,9 @@ def main():
         elif args.test:
             a.organization_list()
             b.get_task(FULL_PATH)
+            b.get_consumers(FULL_PATH)
+            b.get_orphaned_repos(FULL_PATH)
+            b.get_repositories(FULL_PATH)
             a.clean_up()
             a.rhst_upload()
 
