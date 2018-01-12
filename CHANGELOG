@@ -34,8 +34,8 @@
 [done]v1.0.12
 - Add host loop for additional host information
 
-v1.0.13
+[done]v1.0.13
 - Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
 
-v1.0.14
+[done]v1.0.14
 - Add Pulp api calls
