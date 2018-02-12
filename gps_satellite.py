@@ -847,7 +847,6 @@ def main():
             a.compute_profiles()
             a.compute_resources()
             a.config_groups()
-            a.config_reports()
             a.config_templates()
             a.containers_list()
             a.discovered_hosts()
