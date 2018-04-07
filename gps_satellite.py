@@ -11,6 +11,7 @@ import getpass
 import argparse
 import subprocess
 import yum
+import json
 
 # Suppress all warnings. COMMENT OUT FOR WARNINGS
 warnings.filterwarnings("ignore")
@@ -42,7 +43,8 @@ class ApiCall(object):
         if hostname:
             self.hostname = "https://" + hostname
         else:
-            self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+            self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server" + "[" +
+                                                  self.getsatellitefqdn() + "]" + ": ")
 
         # get username
         if username:
@@ -66,6 +68,12 @@ class ApiCall(object):
         self.contentview_id_list()
         self.hosts_id_list()
         self.smart_variable_id_list()
+
+    def getsatellitefqdn(self):
+        with open('/var/lib/rhsm/facts/facts.json', 'r') as f:
+            content = json.loads(f.read())
+            fqdn = content['network.fqdn']
+            return str(fqdn)
 
     # Fallback for Satellite information
     def information(self):
