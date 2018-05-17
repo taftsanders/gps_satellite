@@ -9,8 +9,7 @@ class Pulp_api():
     def __init__(self, hostname=None, path=None):
         self.session = Session()
         selection = raw_input("Are you executing gps-satellite on the Satellite server?[Y/N]")
-        selection.upper()
-        if selection == 'Y':
+        if selection.upper() == 'Y':
             command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
             command2 = ['cut', '-d', ' ', '-f2']
             command3 = ['grep', '^default_password', '/etc/pulp/server.conf']

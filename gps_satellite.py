@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#be sure to put pulp_api.py in the path /usr/lib64/python2.7
 import pulp_api as pulp
 from requests import Session
 from requests.exceptions import ConnectionError
@@ -43,8 +44,14 @@ class ApiCall(object):
         if hostname:
             self.hostname = "https://" + hostname
         else:
-            self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server" + "[" +
-                                                  self.getsatellitefqdn() + "]" + ": ")
+            submanfact = self.getsatellitefqdn()
+            print(self.getsatellitefqdn())
+            autopopulate = str(raw_input("Would you like to use the hostname:[Y/N]"))
+            if autopopulate.upper() == "Y":
+                print(submanfact)
+                self.hostname = "https://" + submanfact
+            else:
+                self.hostname = "https://" + raw_input("Please enter the FQDN or IP of the Satellite server")
 
         # get username
         if username:
@@ -204,12 +211,13 @@ class ApiCall(object):
                 command = "redhat-support-tool addattachment -c " + case_num + " " + DIR + FILE_NAME
                 p = subprocess.Popen(command, shell=True)
                 p.wait()
-                if p.returncode == 0:
+                cleanup = raw_input("If your file uploaded successfully you can type 'Y' to remove the file from the local"
+                                    " filesystem, otherwise type 'N' to exit and upload the file manually:[Y/N] ")
+                if cleanup.upper() == "Y":
                     os.remove(DIR + FILE_NAME)
                     break
                 else:
-                    print("There appears to be an issue with uploading the Satellite mapping to the case. Please "
-                          "upload the file manually to the case through the customer portal.")
+                    break
             elif option.upper() == 'N':
                 print("Please upload " + DIR + FILE_NAME + " to your case.")
                 break

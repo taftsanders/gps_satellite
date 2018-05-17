@@ -40,8 +40,8 @@
 [done]v1.0.14
 - Add Pulp api calls
 
-v1.0.15
+[done]v1.0.15
 - Grab Satellite hostname from the local system, offer as "Enter" default when prompted for the FQDN
 
-v1.0.16
+[done]v1.0.15
 - Graceful fail of RHST upload and reminder that file is in /tmp 
