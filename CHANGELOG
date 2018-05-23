@@ -45,3 +45,9 @@
 
 [done]v1.0.15
 - Graceful fail of RHST upload and reminder that file is in /tmp 
+
+v1.0.16
+- Activation key content switch
+
+v1.0.16
+- /api/hosts/<HOST ID> for all hosts with switch
