@@ -48,10 +48,9 @@ class ApiCall(object):
             print(self.getsatellitefqdn())
             autopopulate = str(raw_input("Would you like to use the hostname:[Y/N]"))
             if autopopulate.upper() == "Y":
-                print(submanfact)
                 self.hostname = "https://" + submanfact
             else:
-                self.hostname = "https://" + raw_input("Please enter the FQDN or IP of the Satellite server")
+                self.hostname = "https://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
 
         # get username
         if username:
@@ -523,6 +522,18 @@ class ApiCall(object):
             print("Gathering all hosts for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/hosts", "hosts_org" + str(i))
 
+    # Gather individual host details
+    def host_details(self):
+        for i in self.org_id_list:
+            self.org_host_list = []
+            org_host = self.session.get(self.hostname + '/api/organizations/' + str(i) + '/hosts').json()
+            print("Collecting information on each host in Org id: " + str(i))
+            for h in org_host['results']:
+                self.org_host_list.append(h['id'])
+            for j in self.org_host_list:
+                print("Collecting information on host id: " + str(j))
+                self.search("/api/hosts/" + str(j), "host" + str(j) + "_org" + str(i))
+
     # Gather all REX templates
     def rex_templates_list(self):
         for i in self.org_id_list:
@@ -773,6 +784,7 @@ def main():
             a.cv_history_list()
             a.cv_puppet_modules_list()
             a.override_values_list()
+            a.host_details()
             a.clean_up()
             a.rhst_upload()
         elif args.errata:
@@ -917,6 +929,7 @@ def main():
             a.cv_history_list()
             a.cv_puppet_modules_list()
             a.override_values_list()
+            a.host_details()
             a.clean_up()
             a.rhst_upload()
     else:
