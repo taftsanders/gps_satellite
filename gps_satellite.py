@@ -480,6 +480,12 @@ class ApiCall(object):
     ###################START OF DEPENDANT API CALLS############################
     ###########################################################################
 
+    # Gather details of Satellite Organizations
+    def organization_details(self):
+        for org in self.org_id_list:
+            print("Gathering Organization details for Org: " + str(org))
+            self.search("/katello/api/organizations/" + str(org), "organization_" + str(org))
+
     # Gather all activation keys
     def activation_key_list(self):
         for i in self.org_id_list:
@@ -697,6 +703,9 @@ def main():
                             "--test",
                             help="Test API call to the Satellite (organization call)",
                             action="store_true")
+        parser.add_argument("--activation_key",
+                            help="Collect API calls relevant to activation keys and use",
+                            action="store_true")
         args = parser.parse_args()
 
         a = ApiCall(args.hostname, args.username, args.password)
@@ -707,6 +716,7 @@ def main():
             #####INDEPENDENT CALLS#####
             ###########################
             a.organization_list()
+            a.organization_details()
             a.location_list()
             a.capsule_list()
             a.dashboard_details()
@@ -785,6 +795,10 @@ def main():
             a.cv_puppet_modules_list()
             a.override_values_list()
             a.host_details()
+            b.get_task(FULL_PATH)
+            b.get_consumers(FULL_PATH)
+            b.get_orphaned_repos(FULL_PATH)
+            b.get_repositories(FULL_PATH)
             a.clean_up()
             a.rhst_upload()
         elif args.errata:
@@ -793,6 +807,7 @@ def main():
             a.rhst_upload()
         elif args.content_view:
             a.organization_list()
+            a.organization_details()
             a.location_list()
             a.capsule_list()
             a.errata_list()
@@ -816,6 +831,7 @@ def main():
             a.rhst_upload()
         elif args.provision:
             a.organization_list()
+            a.organization_details()
             a.location_list()
             a.capsule_list()
             a.domain_list()
@@ -842,11 +858,18 @@ def main():
             a.clean_up()
             a.rhst_upload()
         elif args.test:
+            a.clean_up()
+            a.rhst_upload()
+        elif args.activation_key:
             a.organization_list()
-            b.get_task(FULL_PATH)
-            b.get_consumers(FULL_PATH)
-            b.get_orphaned_repos(FULL_PATH)
-            b.get_repositories(FULL_PATH)
+            a.organization_details()
+            a.activation_key_list()
+            a.host_collection_list()
+            a.hosts_lists()
+            a.host_details()
+            a.products_list()
+            a.content_views_list()
+            a.subscription_list()
             a.clean_up()
             a.rhst_upload()
 
@@ -855,6 +878,7 @@ def main():
             #####INDEPENDENT CALLS#####
             ###########################
             a.organization_list()
+            a.organization_details()
             a.location_list()
             a.capsule_list()
             a.dashboard_details()
@@ -930,6 +954,10 @@ def main():
             a.cv_puppet_modules_list()
             a.override_values_list()
             a.host_details()
+            b.get_task(FULL_PATH)
+            b.get_consumers(FULL_PATH)
+            b.get_orphaned_repos(FULL_PATH)
+            b.get_repositories(FULL_PATH)
             a.clean_up()
             a.rhst_upload()
     else:
