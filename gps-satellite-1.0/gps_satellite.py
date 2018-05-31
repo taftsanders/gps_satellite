@@ -484,7 +484,7 @@ class ApiCall(object):
     def organization_details(self):
         for org in self.org_id_list:
             print("Gathering Organization details for Org: " + str(org))
-            self.search("/katello/api/organizations/" + str(org), "organization_" + str(org))
+            self.search("/katello/api/organizations/" + str(org), "organizational_details_org" + str(org))
 
     # Gather all activation keys
     def activation_key_list(self):
