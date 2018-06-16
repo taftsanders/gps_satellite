@@ -50,7 +50,8 @@ class ApiCall(object):
             if autopopulate.upper() == "Y":
                 self.hostname = "https://" + submanfact
             else:
-                self.hostname = "https://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+                self.hostname = "https://" + raw_input("Please enter the FQDN or \
+                                                        IP of the Satellite server: ")
 
         # get username
         if username:
@@ -76,27 +77,28 @@ class ApiCall(object):
         self.smart_variable_id_list()
 
     def getsatellitefqdn(self):
-        with open('/var/lib/rhsm/facts/facts.json', 'r') as f:
-            content = json.loads(f.read())
+        with open('/var/lib/rhsm/facts/facts.json', 'r') as fact:
+            content = json.loads(fact.read())
             fqdn = content['network.fqdn']
             return str(fqdn)
 
     # Fallback for Satellite information
     def information(self):
-        self.hostname = "http://" + raw_input("Please enter the FQDN or IP of the Satellite server: ")
+        self.hostname = "http://" + raw_input("Please enter the FQDN \
+        or IP of the Satellite server: ")
         self.sat_admin = raw_input("Please enter the Satellite admin username: ")
         self.sat_pw = getpass.getpass("Please enter the password of this user: ")
 
     # Test Satellite connectivity with user and password
     def __connection_test(self):
-            try:
-                self.organization_id_list()
-            except KeyError:
-                print("Incorrect Username or Password given, please try again")
-                self.information()
-            except (ConnectionError, ValueError):
-                print("Incorrect URL given, please try again")
-                self.information()
+        try:
+            self.organization_id_list()
+        except KeyError:
+            print("Incorrect Username or Password given, please try again")
+            self.information()
+        except (ConnectionError, ValueError):
+            print("Incorrect URL given, please try again")
+            self.information()
 
     # Organization id loop to gather all org id's for additional api calls
     def organization_id_list(self):
@@ -104,25 +106,26 @@ class ApiCall(object):
         self.org_id_list = []
         print("Initializing Organization list")
         org_list = self.session.get(self.hostname + '/katello/api/organizations').json()
-        for x in org_list['results']:
-            self.org_id_list.append(x['id'])
+        for result in org_list['results']:
+            self.org_id_list.append(result['id'])
 
     # Capsule id loop to gather all capsule id's for additional api calls
     def capsule_id_list(self):
         """Collection of capsule ids."""
-        self.cap_id_list =[]
+        self.cap_id_list = []
         print("Initializing Capsule list")
         capsule_list = self.session.get(self.hostname + '/katello/api/capsules').json()
-        for x in capsule_list['results']:
-            self.cap_id_list.append(x['id'])
+        for result in capsule_list['results']:
+            self.cap_id_list.append(result['id'])
 
     # Lifecycle env. id loop to gather all lce id's for additional information
     def lce_id_list(self):
         """Collection of lifecycle environment ids"""
         self.lifecycle_id_list = []
         print("Initializing Lifecycle Environment list")
-        for x in self.org_id_list:
-            lce_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/environments').json()
+        for org in self.org_id_list:
+            lce_list = self.session.get(self.hostname + '/katello/api/organizations/'
+                                        + str(org) + '/environments').json()
             for i in lce_list['results']:
                 self.lifecycle_id_list.append(i['id'])
 
@@ -132,16 +135,17 @@ class ApiCall(object):
         self.compute_res_id_list = []
         print("Initializing Compute Resource list")
         compute_res_list = self.session.get(self.hostname + '/api/compute_resources').json()
-        for x in compute_res_list['results']:
-            self.compute_res_id_list.append(x['id'])
+        for result in compute_res_list['results']:
+            self.compute_res_id_list.append(result['id'])
 
     # Content view id loop to gather all content view id's for additional information
     def contentview_id_list(self):
         """Collection of content view ids"""
         self.contentview_id = []
         print("Initializing Content view list list")
-        for x in self.org_id_list:
-            cv_list = self.session.get(self.hostname + '/katello/api/organizations/' + str(x) + '/content_views').json()
+        for result in self.org_id_list:
+            cv_list = self.session.get(self.hostname + '/katello/api/organizations/'
+                                       + str(result) + '/content_views').json()
             for i in cv_list['results']:
                 self.contentview_id.append(i['id'])
 
@@ -150,8 +154,9 @@ class ApiCall(object):
         """Collection of host ids"""
         self.hosts_id = []
         print("Initializing Host list")
-        for x in self.org_id_list:
-            host_list = self.session.get(self.hostname + '/api/organizations/' + str(x) + '/hosts').json()
+        for result in self.org_id_list:
+            host_list = self.session.get(self.hostname + '/api/organizations/'
+                                         + str(result) + '/hosts').json()
             for i in host_list['results']:
                 self.hosts_id.append(i['id'])
 
@@ -161,8 +166,8 @@ class ApiCall(object):
         self.smart_variable_id = []
         print("Initializing Puppet Smart Variable list")
         smart_variable_list = self.session.get(self.hostname + '/api/smart_variables').json()
-        for x in smart_variable_list['results']:
-            self.smart_variable_id.append(x['id'])
+        for result in smart_variable_list['results']:
+            self.smart_variable_id.append(result['id'])
 
     # API query, check for file path, create filepath(if needed), writes results to file.
     def search(self, call=None, name=None):
@@ -173,9 +178,9 @@ class ApiCall(object):
                 if not os.path.exists(FULL_PATH):
                     os.makedirs(FULL_PATH)
                     os.chdir(FULL_PATH)
-                with open(name + '.json', 'w') as fw:
+                with open(name + '.json', 'w') as file:
                     content = ret.content
-                    fw.write(content)
+                    file.write(content)
             else:
                 return ret.text
         else:
@@ -194,24 +199,27 @@ class ApiCall(object):
     # Use case 01979320 for testing
     def rhst_upload(self):
         """Upload mapping to case with RHST"""
-        option = raw_input("Would you like to upload this file to your case? [Y/N]:\n(Please note this will require "
-                           "installing the redhat-support-tool if you do not already have it installed)\n")
+        option = raw_input("Would you like to upload this file to your case? [Y/N]:\
+        \n(Please note this will require installing the redhat-support-tool\
+         if you do not already have it installed)\n")
         while True:
             if option.upper() == 'Y':
-                yb = yum.YumBase()
-                if yb.rpmdb.searchNevra(name='redhat-support-tool'):
-                    print "redhat-support-tool installed!"
+                yumbase = yum.YumBase()
+                if yumbase.rpmdb.searchNevra(name='redhat-support-tool'):
+                    print("redhat-support-tool installed!")
                 else:
-                    print "redhat-support-tool not installed"
-                    print "installing redhat-support-tool..."
-                    a = subprocess.Popen("yum install redhat-support-tool -y", shell=True)
-                    a.wait()
-                case_num = raw_input("Please enter the case number you wish to upload this mapping to: ")
+                    print("redhat-support-tool not installed")
+                    print("installing redhat-support-tool...")
+                    installer = subprocess.Popen("yum install redhat-support-tool -y", shell=True)
+                    installer.wait()
+                case_num = raw_input(
+                    "Please enter the case number you wish to upload this mapping to: ")
                 command = "redhat-support-tool addattachment -c " + case_num + " " + DIR + FILE_NAME
-                p = subprocess.Popen(command, shell=True)
-                p.wait()
-                cleanup = raw_input("If your file uploaded successfully you can type 'Y' to remove the file from the local"
-                                    " filesystem, otherwise type 'N' to exit and upload the file manually:[Y/N] ")
+                process = subprocess.Popen(command, shell=True)
+                process.wait()
+                cleanup = raw_input("If your file uploaded successfully you can type 'Y' to remove\
+                 the file from the local filesystem, otherwise type 'N' to exit and upload the file\
+                  manually:[Y/N] ")
                 if cleanup.upper() == "Y":
                     os.remove(DIR + FILE_NAME)
                     break
@@ -484,37 +492,43 @@ class ApiCall(object):
     def organization_details(self):
         for org in self.org_id_list:
             print("Gathering Organization details for Org: " + str(org))
-            self.search("/katello/api/organizations/" + str(org), "organizational_details_org" + str(org))
+            self.search("/katello/api/organizations/" + str(org), "organizational_details_org"
+                        + str(org))
 
     # Gather all activation keys
     def activation_key_list(self):
         for i in self.org_id_list:
             print("Gathering activation keys for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/activation_keys", "activationkey_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/activation_keys",
+                        "activationkey_org" + str(i))
 
     # Gather all auth source ldaps
     def auth_source_ldap_list(self):
         for i in self.org_id_list:
             print("Gathering ldap auth sources for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/auth_source_ldaps", "auth_source_ldaps_org" + str(i))
+            self.search("/api/organizations/" + str(i) + "/auth_source_ldaps",
+                        "auth_source_ldaps_org" + str(i))
 
     # Gather all content views
     def content_views_list(self):
         for i in self.org_id_list:
             print("Gathering content views for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/content_views", "content_views_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/content_views",
+                        "content_views_org" + str(i))
 
     # Gather all puppet environments
     def puppet_environments_list(self):
         for i in self.org_id_list:
             print("Gathering puppet environments for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/environments", "puppet_environments_org" + str(i))
+            self.search("/api/organizations/" + str(i) + "/environments",
+                        "puppet_environments_org" + str(i))
 
     # Gather all host collections
     def host_collection_list(self):
         for i in self.org_id_list:
             print("Gathering host collections for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/host_collections", "host_collections_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/host_collections",
+                        "host_collections_org" + str(i))
 
     # Gather all hostgroups
     def hostgroups_list(self):
@@ -532,10 +546,11 @@ class ApiCall(object):
     def host_details(self):
         for i in self.org_id_list:
             self.org_host_list = []
-            org_host = self.session.get(self.hostname + '/api/organizations/' + str(i) + '/hosts').json()
+            org_host = self.session.get(self.hostname + '/api/organizations/' + str(i) +
+                                        '/hosts').json()
             print("Collecting information on each host in Org id: " + str(i))
-            for h in org_host['results']:
-                self.org_host_list.append(h['id'])
+            for result in org_host['results']:
+                self.org_host_list.append(result['id'])
             for j in self.org_host_list:
                 print("Collecting information on host id: " + str(j))
                 self.search("/api/hosts/" + str(j), "host" + str(j) + "_org" + str(i))
@@ -544,13 +559,15 @@ class ApiCall(object):
     def rex_templates_list(self):
         for i in self.org_id_list:
             print("Gathering all REX templates for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/job_templates", "rex_templates_org" + str(i))
+            self.search("/api/organizations/" + str(i) + "/job_templates", "rex_templates_org"
+                        + str(i))
 
     # Gather all Lifecycle Environments (LCE)
     def lce_list(self):
         for i in self.org_id_list:
             print("Gathering all Lifecycle Environments for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/environments", "lce_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/environments", "lce_org"
+                        + str(i))
 
     # Gather all Media
     def media_list(self):
@@ -562,7 +579,8 @@ class ApiCall(object):
     def products_list(self):
         for i in self.org_id_list:
             print("Gathering all Products for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/products", "products_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/products", "products_org"
+                        + str(i))
 
     # Gather all provisioning templates
     def provisioning_templates_list(self):
@@ -582,7 +600,8 @@ class ApiCall(object):
     def subscription_list(self):
         for i in self.org_id_list:
             print("Gathering all Subscriptions for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/subscriptions", "subscriptions_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/subscriptions",
+                        "subscriptions_org" + str(i))
 
     # Gather manifest history
     def manifest_history(self):
@@ -595,13 +614,15 @@ class ApiCall(object):
     def sync_plan_list(self):
         for i in self.org_id_list:
             print("Gathering Sync plan for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/sync_plans", "sync_plan_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/sync_plans",
+                        "sync_plan_org" + str(i))
 
     # Gather Uebercerts
     def uebercert_list(self):
         for i in self.org_id_list:
             print("Gathering Ubercert for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/uebercert", "uebercert_org" + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/uebercert",
+                        "uebercert_org" + str(i))
 
     # Gather Capsule assigned lifecycle environments
     def capsule_lce_assigned_list(self):
@@ -609,7 +630,8 @@ class ApiCall(object):
             if i == 1:
                 print("No lifecycle environments for internal Satellite's Capsule, SKIPPING")
             else:
-                print("Gathering Capsule's assigned Lifecycle environments for Capsule id: " + str(i))
+                print("Gathering Capsule's assigned Lifecycle environments for Capsule id: "
+                      + str(i))
                 self.search("/katello/api/capsules/" + str(i) + "/content/lifecycle_environments",
                             "capsule_lce_assigned_cap" + str(i))
 
@@ -619,8 +641,10 @@ class ApiCall(object):
             if i == 1:
                 print("No lifecycle environments for internal Satellite's Capsule, SKIPPING")
             else:
-                print("Gathering Capsule's available Lifecycle environments for Capsule id: " + str(i))
-                self.search("/katello/api/capsules/" + str(i) + "/content/available_lifecycle_environments",
+                print("Gathering Capsule's available Lifecycle environments for Capsule id: "
+                      + str(i))
+                self.search("/katello/api/capsules/" + str(i) +
+                            "/content/available_lifecycle_environments",
                             "capsule_lce_available_cap" + str(i))
 
     # Gather Capsule sync status
@@ -630,13 +654,15 @@ class ApiCall(object):
                 print("No sync status for Satellite's internal Capsule, SKIPPING")
             else:
                 print("Gathering Capsule's sync status for Capsule id: " + str(i))
-                self.search("/katello/api/capsules/" + str(i) + "/content/sync", "capsule_lce_assigned_cap" + str(i))
+                self.search("/katello/api/capsules/" + str(i) + "/content/sync",
+                            "capsule_lce_assigned_cap" + str(i))
 
     # Gather Capsule sync status
     def cr_avail_img_list(self):
         for i in self.compute_res_id_list:
             print("Gathering available images for Compute resource id: " + str(i))
-            self.search("/api/compute_resource/" + str(i) + "/available_images", "cr_available_img_cr" + str(i))
+            self.search("/api/compute_resource/" + str(i) + "/available_images",
+                        "cr_available_img_cr" + str(i))
 
     # Gather Content view filters
     def cv_filter_list(self):
@@ -648,7 +674,8 @@ class ApiCall(object):
     def cv_history_list(self):
         for i in self.contentview_id:
             print("Gathering Content view history for Content view id: " + str(i))
-            self.search("/katello/api/content_views/" + str(i) + "/history", "cv_history_cv" + str(i))
+            self.search("/katello/api/content_views/" + str(i) + "/history",
+                        "cv_history_cv" + str(i))
 
     # Gather Content view puppet modules
     def cv_puppet_modules_list(self):
@@ -661,13 +688,15 @@ class ApiCall(object):
     def host_sub_list(self):
         for i in self.hosts_id:
             print("Gathering Host's subscriptions for Host id: " + str(i))
-            self.search("/api/hosts/" + str(i) + "/subscriptions", "host_subscriptions_host" + str(i))
+            self.search("/api/hosts/" + str(i) + "/subscriptions",
+                        "host_subscriptions_host" + str(i))
 
     # Gather all override values for smart variables
     def override_values_list(self):
         for i in self.smart_variable_id:
             print("Gathering override values for smart variable id: " + str(i))
-            self.search("/api/smart_variables/" + str(i) + "/override_values", "override_values_sv" + str(i))
+            self.search("/api/smart_variables/" + str(i) + "/override_values",
+                        "override_values_sv" + str(i))
 
 
 def main():
@@ -675,11 +704,13 @@ def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("-a",
                             "--all",
-                            help="Run all API calls from Satellite (This includes all options and will take a while)",
+                            help="Run all API calls from Satellite (This includes all options and\
+                             will take a while)",
                             action="store_true")
         parser.add_argument("-e",
                             "--errata",
-                            help="Collect errata only, this could take a while based on the repos you have enabled",
+                            help="Collect errata only, this could take a while based on the repos\
+                             you have enabled",
                             action="store_true")
         parser.add_argument("-u",
                             "--username",
