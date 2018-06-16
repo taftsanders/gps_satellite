@@ -935,6 +935,7 @@ def main():
             a.discovered_hosts()
             a.discovery_rules()
             a.user_role_filters()
+            a.arf_reports()
             a.openscap_contents()
             a.gpgkey_list()
             a.rex_history_list()
