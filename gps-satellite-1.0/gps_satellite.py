@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 #be sure to put pulp_api.py in the path /usr/lib64/python2.7
-import pulp_api as pulp
-from requests import Session
-from requests.exceptions import ConnectionError
 import warnings
 import datetime
 import tarfile
@@ -13,6 +10,9 @@ import argparse
 import subprocess
 import yum
 import json
+import pulp_api as pulp
+from requests import Session
+from requests.exceptions import ConnectionError
 
 # Suppress all warnings. COMMENT OUT FOR WARNINGS
 warnings.filterwarnings("ignore")
@@ -24,6 +24,7 @@ FILE_NAME = 'gps-satellite-' + DATE + '.tar.gz'
 
 
 class ApiCall(object):
+    """Class of apicalls for Satellite 6.2+"""
 
     def __init__(self, hostname=None, username=None, password=None):
         """Initializing needed variables and lists for all api calls
@@ -697,7 +698,6 @@ class ApiCall(object):
             print("Gathering override values for smart variable id: " + str(i))
             self.search("/api/smart_variables/" + str(i) + "/override_values",
                         "override_values_sv" + str(i))
-
 
 def main():
     if os.geteuid() == 0:
