@@ -740,7 +740,7 @@ def main():
         args = parser.parse_args()
 
         sat_api = ApiCall(args.hostname, args.username, args.password)
-        pulp_api = pulp.pulp_api(sat_api.hostname, path=FULL_PATH)
+        pulp_api = pulp.Pulp_api(sat_api.hostname, path=FULL_PATH)
 
         if args.all:
             ###########################
