@@ -993,6 +993,3 @@ def main():
             sat_api.rhst_upload()
     else:
         print("Please run as the root user.")
-
-
-main()
