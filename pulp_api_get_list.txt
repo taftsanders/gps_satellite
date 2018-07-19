@@ -1,0 +1,2157 @@
+==========================================================================================================================================
+Retrieve a Single Binding
+Retrieves information on a single binding between a consumer and a repository.
+
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/bindings/<repo_id>/<distributor_id>
+Permission: read
+Query Parameters: None; the consumer ID, repository ID and distributor ID are included in the URL itself. There are no supported query parameters.
+Response Codes:
+200 - if the bind exists
+404 - if the given IDs don’t exist, or if no bind exists with the given IDs
+Return: database representation of the matching bind
+Sample 200 Response Body:
+
+{
+   "_href": "/pulp/api/v2/consumers/test-consumer/bindings/test-repo/yum_distributor/",
+   "_id": {
+       "$oid": "55097a6045ef4829b243f102"
+   },
+   "_ns": "consumer_bindings",
+   "binding_config": {},
+   "consumer_actions": [
+       {
+           "action": "bind",
+           "id": "d991aef8-cd50-402e-9e1b-84a2729b34a3",
+           "status": "pending",
+           "timestamp": 1426684512.37454
+       }
+   ],
+   "consumer_id": "test-consumer",
+   "deleted": false,
+   "details": {
+       "ca_cert": null,
+       "client_cert": null,
+       "gpg_keys": [],
+       "protocols": [
+           "https"
+       ],
+       "relative_path": "/pulp/repos/test-repo",
+       "repo_name": "test-repo",
+       "server_name": "example.com"
+   },
+   "distributor_id": "yum_distributor",
+   "id": "55097a6045ef4829b243f102",
+   "notify_agent": true,
+   "repo_id": "test-repo",
+   "type_id": "yum_distributor"
+}
+==========================================================================================================================================
+Retrieve All Bindings
+Retrieves information on all bindings for the specified consumer.
+
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/bindings/
+Permission: read
+Query Parameters: None; the consumer ID is included in the URL itself. There are no supported query parameters.
+Response Codes:
+200 - if the consumer exists
+404 - if the given consumer does not exist
+Return: an array of database representations of the matching binds
+Sample 200 Response Body:
+
+[
+   {
+       "_href": "/pulp/api/v2/consumers/test-consumer/bindings/test-repo/yum_distributor/",
+       "_id": {
+           "$oid": "55097cd045ef4829b081fd28"
+       },
+       "_ns": "consumer_bindings",
+       "binding_config": {},
+       "consumer_actions": [
+           {
+               "action": "bind",
+               "id": "99613d18-1cff-424f-a5dd-9c4357a3f194",
+               "status": "pending",
+               "timestamp": 1426685136.733399
+           }
+       ],
+       "consumer_id": "test-consumer",
+       "deleted": false,
+       "details": {
+           "ca_cert": null,
+           "client_cert": null,
+           "gpg_keys": [],
+           "protocols": [
+               "https"
+           ],
+           "relative_path": "/pulp/repos/test-repo",
+           "repo_name": "test-repo",
+           "server_name": "example.com"
+       },
+       "distributor_id": "yum_distributor",
+       "id": "55097cd045ef4829b081fd28",
+       "notify_agent": true,
+       "repo_id": "test-repo",
+       "type_id": "yum_distributor"
+   },
+   {
+       "_href": "/pulp/api/v2/consumers/test-consumer/bindings/repo1/yum_distributor/",
+       "_id": {
+           "$oid": "55097a6045ef4829b243f102"
+       },
+       "_ns": "consumer_bindings",
+       "binding_config": {},
+       "consumer_actions": [
+           {
+               "action": "bind",
+               "id": "d991aef8-cd50-402e-9e1b-84a2729b34a3",
+               "status": "pending",
+               "timestamp": 1426684512.37454
+           }
+       ],
+       "consumer_id": "test-consumer",
+       "deleted": false,
+       "details": {
+           "ca_cert": null,
+           "client_cert": null,
+           "gpg_keys": [],
+           "protocols": [
+               "https"
+           ],
+           "relative_path": "/pulp/repos/repo1",
+           "repo_name": "repo1",
+           "server_name": "example.com"
+       },
+       "distributor_id": "yum_distributor",
+       "id": "55097a6045ef4829b243f102",
+       "notify_agent": true,
+       "repo_id": "repo1",
+       "type_id": "yum_distributor"
+   }
+]
+==========================================================================================================================================
+Retrieve Binding By Consumer And Repository
+Retrieves information on all bindings between a consumer and a repository.
+
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/bindings/<repo_id>/
+Permission: read
+Query Parameters: None; the consumer and repository IDs are included in the URL itself. There are no supported query parameters.
+Response Codes:
+200 - if both the consumer and repository IDs are valid
+404 - if one or both of the given ids are not valid
+Return: an array of objects, where each object represents a binding
+Sample 200 Response Body:
+
+[
+ {
+   "notify_agent": true,
+   "repo_id": "test_repo",
+   "_href": "/pulp/api/v2/consumers/test_consumer/bindings/test_repo/test_distributor/",
+   "type_id": "test_distributor",
+   "consumer_actions": [
+     {
+       "status": "pending",
+       "action": "bind",
+       "id": "3a8713bb-6902-4f11-a725-17c7f1f6586a",
+       "timestamp": 1402688658.785708
+     }
+   ],
+   "_ns": "consumer_bindings",
+   "distributor_id": "test_distributor",
+   "consumer_id": "test_consumer",
+   "deleted": false,
+   "binding_config": {},
+   "details": {
+     "server_name": "pulp.example.com",
+     "ca_cert": null,
+     "relative_path": "/pulp/repos/test_repo",
+     "gpg_keys": [],
+     "client_cert": null,
+     "protocols": [
+       "https"
+     ],
+     "repo_name": "test_repo"
+   },
+   "_id": {
+     "$oid": "539b54927bc8f6388640871d"
+   },
+   "id": "539b54927bc8f6388640871d"
+ }
+]
+==========================================================================================================================================
+Retrieve a Single Consumer
+Retrieves information on a single Pulp consumer. The returned data includes general consumer details.
+
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/
+Permission: read
+Query Parameters:
+details (boolean) - include all details about the consumer
+bindings (boolean) - include information about consumer bindings
+Response Codes:
+200 - if the consumer exists
+404 - if no consumer exists with the given ID
+Return: database representation of the matching consumer with the addition of repository bindings information for the consumer
+Sample 200 Response Body:
+
+{
+  "display_name": "test-consumer",
+  "description": null,
+  "certificate": "-----BEGIN CERTIFICATE-----\nMIICHDCCAQQCATowDQYJKoZIhvcNAQEFBQAwFDESMBAGA1UEAxMJbG9jYWxob3N0\nMB4XDTEyMDUyMzE5MDY0MFoXDTIyMDUyMTE5MDY0MFowGDEWMBQGA1UEAxMNdGVz\ndC1jb25zdW1lcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA7XNQasWOzu0B\nmIr4ByA91GOXXdL1ygxg1iI7XLt3cKyIl7UiJuVDVqjW4/UJ7In3vZYVgGE4hfye\n9/tTxkcYcFqddMclSHmkYTL5LTB564ToJN3XBUFWoqQgi3/tn9GPHiM8u0BQiqFF\nCL+B8trz/F7oh0CuwwCbh7YSZCYSJjMCAwEAATANBgkqhkiG9w0BAQUFAAOCAQEA\nOiaWBqBU5ye8RkOjNg2H8t5EeH5aUi0sQLNd5ER0RKL3hGv7lOaDi2JrEVYefBLW\ntHS7oOKcl1Naf1VI0xoG775fSph+SuHokJkwhqMCZFV+YK5838Rzt46i1s9+EOZn\ncFwn8AUc6f5hlf59OevRzDxzYxd2tFldmlR/mOhIezkpQe/C1bPvYRqu+rNyJNCZ\neoUQkTf/NOQjwYp1u+jyksWGvHctORHPt6OMJwpKu1mhIbmAcNPWvLqvG8kAdU47\nPk3Hipuj/HpjHurn7C6Gm1zb5mgRKaYke6LTf6Hd3/txjBo7gqkwoP3QvPmgV3Dn\n8Y3PoRxp7uq32ogr9j+I1g==\n-----END CERTIFICATE-----",
+  "_ns": "consumers",
+  "notes": {"arch":"i386"},
+  "capabilities": {},
+  "unit_profile": [],
+  "bindings": [],
+  "_id": {
+    "$oid": "4fbd3540e5e7102dae000015"
+  },
+  "id": "test-consumer"
+}
+==========================================================================================================================================
+Retrieve All Consumers
+Returns information on all consumers in the Pulp server. Eventually this call will support query parameters to limit the results and provide searching capabilities. This call will never return a 404; an empty array is returned in the case where there are no consumers.
+
+Method: GET
+Path: /pulp/api/v2/consumers/
+Permission: read
+Query Parameters:
+details (boolean) - include all details about the consumer
+bindings (boolean) - include information about consumer bindings
+Response Codes:
+200 - containing the array of consumers
+Return: the same format as retrieving a single consumer, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+ {
+   "display_name": "test-consumer",
+   "description": null,
+   "certificate": "-----BEGIN CERTIFICATE-----\nMIICHDCCAQQCATowDQYJKoZIhvcNAQEFBQAwFDESMBAGA1UEAxMJbG9jYWxob3N0\nMB4XDTEyMDUyMzE5MDY0MFoXDTIyMDUyMTE5MDY0MFowGDEWMBQGA1UEAxMNdGVz\ndC1jb25zdW1lcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA7XNQasWOzu0B\nmIr4ByA91GOXXdL1ygxg1iI7XLt3cKyIl7UiJuVDVqjW4/UJ7In3vZYVgGE4hfye\n9/tTxkcYcFqddMclSHmkYTL5LTB564ToJN3XBUFWoqQgi3/tn9GPHiM8u0BQiqFF\nCL+B8trz/F7oh0CuwwCbh7YSZCYSJjMCAwEAATANBgkqhkiG9w0BAQUFAAOCAQEA\nOiaWBqBU5ye8RkOjNg2H8t5EeH5aUi0sQLNd5ER0RKL3hGv7lOaDi2JrEVYefBLW\ntHS7oOKcl1Naf1VI0xoG775fSph+SuHokJkwhqMCZFV+YK5838Rzt46i1s9+EOZn\ncFwn8AUc6f5hlf59OevRzDxzYxd2tFldmlR/mOhIezkpQe/C1bPvYRqu+rNyJNCZ\neoUQkTf/NOQjwYp1u+jyksWGvHctORHPt6OMJwpKu1mhIbmAcNPWvLqvG8kAdU47\nPk3Hipuj/HpjHurn7C6Gm1zb5mgRKaYke6LTf6Hd3/txjBo7gqkwoP3QvPmgV3Dn\n8Y3PoRxp7uq32ogr9j+I1g==\n-----END CERTIFICATE-----",
+   "_ns": "consumers",
+   "notes": {"arch":"i386"},
+   "capabilities": {},
+   "unit_profile": [],
+   "bindings": [],
+   "_id": {
+     "$oid": "4fbd3540e5e7102dae000015"
+   },
+   "id": "test-consumer"
+ },
+ {
+   "display_name": "test-consumer1",
+   "description": null,
+   "certificate": "-----BEGIN CERTIFICATE-----\nMIICHDCCAQQCATowDQYJKoZIhvcNApCEFBQAwFDESMBAGA1UEAxMJbG9jYWxob3N0\nMB4XDTEyMDUyMzE5MDY0MFoXDTIyMDUyMTE5MDY0MFowGDEWMBQGA1UEAxMNdGVz\ndC1jb25zdW1lcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA7XNQasWOzu0B\nmIr4ByA91GOXXdL1ygxg1iI7XLt3cKyIl7UiJuVDVqjW4/UJ7In3vZYVgGE4hfye\n9/tTxkcYcFqddMclSHmkYTL5LTB564ToJN3XBUFWoqQgi3/tn9GPHiM8u0BQiqFF\nCL+B8trz/F7oh0CuwwCbh7YSZCYSJjMCAwEAATANBgkqhkiG9w0BAQUFAAOCAQEA\nOiaWBqBU5ye8RkOjNg2H8t5EeH5aUi0sQLNd5ER0RKL3hGv7lOaDi2JrEVYefBLW\ntHS7oOKcl1Naf1VI0xoG775fSph+SuHokJkwhqMCZFV+YK5838Rzt46i1s9+EOZn\ncFwn8AUc6f5hlf59OevRzDxzYxd2tFldmlR/mOhIezkpQe/C1bPvYRqu+rNyJNCZ\neoUQkTf/NOQjwYp1u+jyksWGvHctORHPt6OMJwpKu1mhIbmAcNPWvLqvG8kAdU47\nPk3Hipuj/HpjHurn7C6Gm1zb5mgRKaYke6LTf6Hd3/txjBo7gqkwoP3QvPmgV3Dn\n8Y3PoRxp7uq32ogr9j+I1g==\n-----END CERTIFICATE-----",
+   "_ns": "consumers",
+   "notes": {},
+   "capabilities": {},
+   "unit_profile": [],
+   "bindings": [],
+   "_id": {
+     "$oid": "4fbd3540e5e7102dae00000d"
+   },
+   "id": "test-consumer1"
+ }
+]
+==========================================================================================================================================
+Advanced Search for Consumers
+This method is slightly more limiting than the POST alternative, because some filter expressions may not be serializable as query parameters.
+
+Method: GET
+Path: /pulp/api/v2/consumers/search/
+Permission: read
+Query Parameters: query params should match the attributes of a Criteria object as defined in Search Criteria. For example: /v2/consumers/search/?field=id&field=display_name&limit=20’ Include the key ‘bindings’ to have the ‘bindings’ attribute, an array of related bindings, added to each returned consumer.
+Response Codes:
+200 - containing the array of consumers
+Return: the same format as retrieving a single consumer, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+ {
+   "display_name": "test-consumer",
+   "description": null,
+   "certificate": "-----BEGIN CERTIFICATE-----\nMIICHDCCAQQCATowDQYJKoZIhvcNAQEFBQAwFDESMBAGA1UEAxMJbG9jYWxob3N0\nMB4XDTEyMDUyMzE5MDY0MFoXDTIyMDUyMTE5MDY0MFowGDEWMBQGA1UEAxMNdGVz\ndC1jb25zdW1lcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA7XNQasWOzu0B\nmIr4ByA91GOXXdL1ygxg1iI7XLt3cKyIl7UiJuVDVqjW4/UJ7In3vZYVgGE4hfye\n9/tTxkcYcFqddMclSHmkYTL5LTB564ToJN3XBUFWoqQgi3/tn9GPHiM8u0BQiqFF\nCL+B8trz/F7oh0CuwwCbh7YSZCYSJjMCAwEAATANBgkqhkiG9w0BAQUFAAOCAQEA\nOiaWBqBU5ye8RkOjNg2H8t5EeH5aUi0sQLNd5ER0RKL3hGv7lOaDi2JrEVYefBLW\ntHS7oOKcl1Naf1VI0xoG775fSph+SuHokJkwhqMCZFV+YK5838Rzt46i1s9+EOZn\ncFwn8AUc6f5hlf59OevRzDxzYxd2tFldmlR/mOhIezkpQe/C1bPvYRqu+rNyJNCZ\neoUQkTf/NOQjwYp1u+jyksWGvHctORHPt6OMJwpKu1mhIbmAcNPWvLqvG8kAdU47\nPk3Hipuj/HpjHurn7C6Gm1zb5mgRKaYke6LTf6Hd3/txjBo7gqkwoP3QvPmgV3Dn\n8Y3PoRxp7uq32ogr9j+I1g==\n-----END CERTIFICATE-----",
+   "_ns": "consumers",
+   "notes": {"arch":"i386"},
+   "capabilities": {},
+   "unit_profile": [],
+   "bindings": [],
+   "_id": {
+     "$oid": "4fbd3540e5e7102dae000015"
+   },
+   "id": "test-consumer"
+ },
+ {
+   "display_name": "test-consumer1",
+   "description": null,
+   "certificate": "-----BEGIN CERTIFICATE-----\nMIICHDCCAQQCATowDQYJKoZIhvcNApCEFBQAwFDESMBAGA1UEAxMJbG9jYWxob3N0\nMB4XDTEyMDUyMzE5MDY0MFoXDTIyMDUyMTE5MDY0MFowGDEWMBQGA1UEAxMNdGVz\ndC1jb25zdW1lcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA7XNQasWOzu0B\nmIr4ByA91GOXXdL1ygxg1iI7XLt3cKyIl7UiJuVDVqjW4/UJ7In3vZYVgGE4hfye\n9/tTxkcYcFqddMclSHmkYTL5LTB564ToJN3XBUFWoqQgi3/tn9GPHiM8u0BQiqFF\nCL+B8trz/F7oh0CuwwCbh7YSZCYSJjMCAwEAATANBgkqhkiG9w0BAQUFAAOCAQEA\nOiaWBqBU5ye8RkOjNg2H8t5EeH5aUi0sQLNd5ER0RKL3hGv7lOaDi2JrEVYefBLW\ntHS7oOKcl1Naf1VI0xoG775fSph+SuHokJkwhqMCZFV+YK5838Rzt46i1s9+EOZn\ncFwn8AUc6f5hlf59OevRzDxzYxd2tFldmlR/mOhIezkpQe/C1bPvYRqu+rNyJNCZ\neoUQkTf/NOQjwYp1u+jyksWGvHctORHPt6OMJwpKu1mhIbmAcNPWvLqvG8kAdU47\nPk3Hipuj/HpjHurn7C6Gm1zb5mgRKaYke6LTf6Hd3/txjBo7gqkwoP3QvPmgV3Dn\n8Y3PoRxp7uq32ogr9j+I1g==\n-----END CERTIFICATE-----",
+   "_ns": "consumers",
+   "notes": {},
+   "capabilities": {},
+   "unit_profile": [],
+   "bindings": [],
+   "_id": {
+     "$oid": "4fbd3540e5e7102dae00000d"
+   },
+   "id": "test-consumer1"
+ }
+]
+==========================================================================================================================================
+Listing Schedules
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer id>/schedules/content/<action>/
+Permission: read
+Response Codes:
+200 - if the consumer exists
+404 - if the consumer does not exist
+Return: (possibly empty) array of schedule resources
+Sample 200 Response Body:
+
+[
+ {
+   "next_run": "2014-01-28T16:33:26Z",
+   "task": "pulp.server.tasks.consumer.update_content",
+   "last_updated": 1390926003.828128,
+   "first_run": "2014-01-28T10:35:08Z",
+   "schedule": "2014-01-28T10:35:08Z/P1D",
+   "args": [
+     "me"
+   ],
+   "enabled": true,
+   "last_run_at": null,
+   "_id": "52e7d8b3dd01fb0c8428b8c2",
+   "total_run_count": 0,
+   "failure_threshold": null,
+   "kwargs": {
+     "units": [
+       {
+         "unit_key": {
+           "name": "pulp-server"
+         },
+         "type_id": "rpm"
+       }
+     ],
+     "options": {}
+   },
+   "units": [
+     {
+       "unit_key": {
+         "name": "pulp-server"
+       },
+       "type_id": "rpm"
+     }
+   ],
+   "resource": "pulp:consumer:me",
+   "remaining_runs": null,
+   "consecutive_failures": 0,
+   "options": {},
+   "_href": "/pulp/api/v2/consumers/me/schedules/content/update/52e7d8b3dd01fb0c8428b8c2/"
+ }
+]
+==========================================================================================================================================
+Retrieving a Schedule
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer id>/schedules/content/<action>/<schedule id>/
+Permission: read
+Response Codes:
+200 - if both the consumer and the scheduled install exist
+404 - if either the consumer or scheduled install does not exist
+Return: schedule resource representation
+Sample 200 Response Body:
+
+{
+   "_href": "/pulp/api/v2/consumers/me/schedules/content/update/52e7d8b3dd01fb0c8428b8c2/",
+   "_id": "52e7d8b3dd01fb0c8428b8c2",
+   "args": [
+       "consumer1"
+   ],
+   "consecutive_failures": 0,
+   "enabled": true,
+   "failure_threshold": null,
+   "first_run": "2014-01-28T10:35:08Z",
+   "kwargs": {
+       "options": {},
+       "units": [
+           {
+               "type_id": "rpm",
+               "unit_key": {
+                   "name": "pulp-server"
+               }
+           }
+       ]
+   },
+   "last_run_at": null,
+   "last_updated": 1390926003.828128,
+   "next_run": "2014-01-28T16:50:47Z",
+   "options": {},
+   "remaining_runs": null,
+   "resource": "pulp:consumer:me",
+   "schedule": "2014-01-28T10:35:08Z/P1D",
+   "task": "pulp.server.tasks.consumer.update_content",
+   "total_run_count": 0,
+   "units": [
+       {
+           "type_id": "rpm",
+           "unit_key": {
+               "name": "pulp-server"
+           }
+       }
+   ]
+}
+==========================================================================================================================================
+Retrieve Consumer Event History
+Retrieves the history of events that occurred on a consumer. The array can be filtered by a number of fields including the event type and event timestamp data. Pagination support in the form of limits and skips is also provided.
+
+Valid values for the event type filtering are as follows:
+
+consumer_registered
+consumer_unregistered
+repo_bound
+repo_unbound
+content_unit_installed
+content_unit_uninstalled
+unit_profile_changed
+added_to_group
+removed_from_group
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/history/
+Permission: read
+Query Parameters:
+event_type (string) - (optional) type of event to retrieve; must be one of the values enumerated above
+limit (string) - (optional) maximum number of results to retrieve
+sort (string) - (optional) direction of sort by event timestamp; possible values: ‘ascending’, ‘descending’
+start_date (string) - (optional) earliest date of events that will be retrieved; format: yyyy-mm-dd
+end_date (string) - (optional) latest date of events that will be retrieved; format: yyyy-mm-dd
+Response Codes:
+200 - for the successful retrieval of consumer history
+404 - if the given consumer is not found
+400 - if one or more of the query param are invalid
+Return: empty array or array of event history objects
+Sample Request:
+
+/pulp/api/v2/consumers/test-consumer/history/?sort=descending&limit=2&event_type=consumer_registered
+Sample 200 Response Body:
+
+[
+ {
+   "originator": "SYSTEM",
+   "timestamp": "2012-05-23T19:06:40Z",
+   "consumer_id": "test-consumer",
+   "details": null,
+   "_ns": "consumer_history",
+   "_id": {
+     "$oid": "4fbd3540e5e7102dae000016"
+   },
+   "type": "consumer_registered",
+   "id": "4fbd3540e5e7102dae000016"
+ },
+ {
+   "originator": "SYSTEM",
+   "timestamp": "2012-05-23T19:03:29Z",
+   "consumer_id": "test-consumer1",
+   "details": null,
+   "_ns": "consumer_history",
+   "_id": {
+     "$oid": "4fbd3481e5e7102dae00000f"
+   },
+   "type": "consumer_registered",
+   "id": "4fbd3481e5e7102dae00000f"
+ }
+]
+==========================================================================================================================================
+Retrieve All Profiles By Consumer Id
+Retrieves information on all unit profile entries associated with a consumer.
+
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/profiles/
+Permission: read
+Query Parameters: None; There are no supported query parameters
+Response Codes:
+200 - regardless of whether any profiles exist
+404 - if the consumer does not exist
+Return: an array of unit profile objects or an empty array if none exist
+Sample 200 Response Body:
+
+[
+ {"_href": "/pulp/api/v2/consumers/test-consumer/profiles/test-content-type/",
+  "_id": {"$oid": "521d92b1e5e7102f7500004a"},
+  "_ns": "consumer_unit_profiles",
+  "consumer_id": "test-consumer",
+  "content_type": "test-content-type",
+  "id": "521d92b1e5e7102f7500004a",
+  "profile": [{"arch": "i686",
+               "epoch": 0,
+               "name": "glib2",
+               "release": "2.fc17",
+               "vendor": "Fedora Project",
+               "version": "2.32.4"},
+              {"arch": "x86_64",
+               "epoch": 0,
+               "name": "rpm-libs",
+               "release": "8.fc17",
+               "vendor": "Fedora Project",
+               "version": "4.9.1.3"}],
+  "profile_hash": "15df1c6105edacd6b167d2e9dd87311b069f50cebb2f7968ef185c1d6eae5197"
+ },
+ {"_href": "/pulp/api/v2/consumers/test-consumer/profiles/rpm/",
+  "_id": {"$oid": "5217d77de5e710796700000c"},
+  "_ns": "consumer_unit_profiles",
+  "consumer_id": "test-consumer",
+  "content_type": "rpm",
+  "id": "5217d77de5e710796700000c",
+  "profile": [{"arch": "i686",
+               "epoch": 0,
+               "name": "glib2",
+               "release": "2.fc17",
+               "vendor": "Fedora Project",
+               "version": "2.32.4"}],
+  "profile_hash": "15df1c6105edacd6b167d2e9dd87311b069f50cebb2f7968ef185c1d6eae5197"
+ }
+]
+==========================================================================================================================================
+Retrieve a Profile By Content Type
+Retrieves a unit profile associated with a consumer by content type.
+
+Method: GET
+Path: /pulp/api/v2/consumers/<consumer_id>/profiles/<content_type>/
+Permission: read
+Query Parameters: None; There are no supported query parameters
+Response Codes:
+200 - if profile exists
+404 - if the consumer or requested profile does not exists
+Return: the requested unit profile object
+Sample 200 Response Body:
+
+{
+  "_href": "/pulp/api/v2/consumers/test-consumer/profiles/test-content-type/",
+  "_id": {"$oid": "521d92b1e5e7102f7500004a"},
+  "_ns": "consumer_unit_profiles",
+  "consumer_id": "test-consumer",
+  "content_type": "test-content-type",
+  "id": "521d92b1e5e7102f7500004a",
+  "profile": [{"arch": "i686",
+               "epoch": 0,
+               "name": "glib2",
+               "release": "2.fc17",
+               "vendor": "Fedora Project",
+               "version": "2.32.4"},
+              {"arch": "x86_64",
+               "epoch": 0,
+               "name": "rpm-libs",
+               "release": "8.fc17",
+               "vendor": "Fedora Project",
+               "version": "4.9.1.3"}],
+  "profile_hash": "15df1c6105edacd6b167d2e9dd87311b069f50cebb2f7968ef185c1d6eae5197"
+}
+==========================================================================================================================================
+Retrieve All Profiles
+Retrieves information on all unit profile entries.
+
+Method: GET
+Path: /pulp/api/v2/consumers/profile/search/
+Permission: read
+Query Parameters: None; There are no supported query parameters
+Response Codes:
+200 - containing the array of items
+Return: array of unit profiles
+Sample 200 Response Body:
+
+[
+  {
+    "profile": [{"arch": "i686",
+                "epoch": 0,
+                "name": "glib2",
+                "release": "2.fc17",
+                "vendor": "Fedora Project",
+                "version": "2.32.4"},
+                {"arch": "x86_64",
+                "epoch": 0,
+                "name": "rpm-libs",
+                "release": "8.fc17",
+                "vendor": "Fedora Project",
+                "version": "4.9.1.3"}],
+    "_ns": "consumer_unit_profiles",
+    "profile_hash": "d20dc2d0fce88a064a2f7309863da7ebd068969de0150fd8ff83c220a0785d8a",
+    "consumer_id": "test-consumer",
+    "content_type": "rpm",
+    "_id": {"$oid": "545cacf09cd4ca28c83dd9f5"},
+    "id": "545cacf09cd4ca28c83dd9f5"
+  }
+]
+==========================================================================================================================================
+Retrieve a Single Repository
+Retrieves information on a single Pulp repository. The returned data includes general repository metadata, metadata describing any importers and distributors associated with it, and a count of how many content units have been stored locally for the repository.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/
+Permission: read
+Query Parameters:
+details (boolean) - (optional) shortcut for including distributors, importers, and content unit counts
+importers (boolean) - (optional) include the “importers” attribute on each repository
+distributors (boolean) - (optional) include the “distributors” attribute on each repository
+Response Codes:
+200 - if the repository exists
+404 - if no repository exists with the given ID
+Return: database representation of the matching repository
+Sample 200 Response Body:
+
+{
+ "display_name": "Harness Repository: harness_repo_1",
+ "description": null,
+ "distributors": [
+   {
+     "scratchpad": 1,
+     "_ns": "repo_distributors",
+     "last_publish": "2012-01-25T15:26:32Z",
+     "auto_publish": false,
+     "distributor_type_id": "harness_distributor",
+     "repo_id": "harness_repo_1",
+     "publish_in_progress": false,
+     "_id": "addf9261-345e-4ce3-ad1e-436ba005287f",
+     "config": {
+       "publish_dir": "/tmp/harness-publish",
+       "write_files": "true"
+     },
+     "id": "dist_1"
+   }
+ ],
+ "notes": {},
+ "scratchpad": {},
+ "content_unit_counts": {},
+ "last_unit_added": "2012-01-25T15:26:32Z",
+ "last_unit_removed": "2012-01-25T15:26:32Z",
+ "importers": [
+   {
+     "scratchpad": 1,
+     "_ns": "repo_importers",
+     "importer_type_id": "harness_importer",
+     "last_sync": "2012-01-25T15:26:32Z",
+     "repo_id": "harness_repo_1",
+     "sync_in_progress": false,
+     "_id": "bbe81308-ef7c-4c0c-b684-385fd627d99e",
+     "config": {
+       "num_units": "5",
+       "write_files": "true"
+     },
+     "id": "harness_importer"
+   }
+ ],
+ "id": "harness_repo_1",
+ "total_repository_units": 5,
+ "locally_stored_units": 3
+}
+==========================================================================================================================================
+Retrieve All Repositories
+Returns information on all repositories in the Pulp server. It is worth noting that this call will never return a 404; an empty array is returned in the case where there are no repositories.
+
+Method: GET
+Path: /pulp/api/v2/repositories/
+Permission: read
+Query Parameters:
+details (boolean) - (optional) shortcut for including both distributors and importers
+importers (boolean) - (optional) include the “importers” attribute on each repository
+distributors (boolean) - (optional) include the “distributors” attribute on each repository
+Response Codes:
+200 - containing the array of repositories
+Return: the same format as retrieving a single repository, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+ {
+   "display_name": "Harness Repository: harness_repo_1",
+   "description": null,
+   "last_unit_added": "2012-01-25T15:26:32Z",
+   "last_unit_removed": null,
+   "distributors": [
+     {
+       "scratchpad": 1,
+       "_ns": "repo_distributors",
+       "last_publish": "2012-01-25T15:26:32Z",
+       "auto_publish": false,
+       "distributor_type_id": "harness_distributor",
+       "repo_id": "harness_repo_1",
+       "publish_in_progress": false,
+       "_id": "addf9261-345e-4ce3-ad1e-436ba005287f",
+       "config": {
+         "publish_dir": "/tmp/harness-publish",
+         "write_files": "true"
+       },
+       "id": "dist_1"
+     }
+   ],
+   "notes": {},
+   "scratchpad": {},
+   "content_unit_counts": {},
+   "importers": [
+     {
+       "scratchpad": 1,
+       "_ns": "repo_importers",
+       "importer_type_id": "harness_importer",
+       "last_sync": "2012-01-25T15:26:32Z",
+       "repo_id": "harness_repo_1",
+       "sync_in_progress": false,
+       "_id": "bbe81308-ef7c-4c0c-b684-385fd627d99e",
+       "config": {
+         "num_units": "5",
+         "write_files": "true"
+       },
+       "id": "harness_importer"
+     }
+   ],
+   "id": "harness_repo_1"
+ }
+]
+==========================================================================================================================================
+Advanced Search for Repositories
+Returns information on repositories in the Pulp server that match your search parameters. It is worth noting that this call will never return a 404; an empty array is returned in the case where there are no repositories.
+
+This method is slightly more limiting than the POST alternative, because some filter expressions may not be serializable as query parameters.
+
+Method: GET
+Path: /pulp/api/v2/repositories/search/
+Permission: read
+Query Parameters: query params should match the attributes of a Criteria object as defined in Search Criteria. The exception is the ‘fields’ parameter, which should be specified in singular form as follows: For example: /v2/repositories/search/?field=id&field=display_name&limit=20’
+details (boolean) - (optional) shortcut for including both distributors and importers
+importers (boolean) - (optional) include the “importers” attribute on each repository
+distributors (boolean) - (optional) include the “distributors” attribute on each repository
+Response Codes:
+200 - containing the array of repositories
+Return: the same format as retrieving a single repository, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+ {
+   "display_name": "Harness Repository: harness_repo_1",
+   "description": null,
+   "distributors": [
+     {
+       "scratchpad": 1,
+       "_ns": "repo_distributors",
+       "last_publish": "2012-01-25T15:26:32Z",
+       "auto_publish": false,
+       "distributor_type_id": "harness_distributor",
+       "repo_id": "harness_repo_1",
+       "publish_in_progress": false,
+       "_id": "addf9261-345e-4ce3-ad1e-436ba005287f",
+       "config": {
+         "publish_dir": "/tmp/harness-publish",
+         "write_files": "true"
+       },
+       "id": "dist_1"
+     }
+   ],
+   "notes": {},
+   "scratchpad": {},
+   "content_unit_counts": {},
+   "last_unit_added": null,
+   "last_unit_removed": null,
+   "importers": [
+     {
+       "scratchpad": 1,
+       "_ns": "repo_importers",
+       "importer_type_id": "harness_importer",
+       "last_sync": "2012-01-25T15:26:32Z",
+       "repo_id": "harness_repo_1",
+       "sync_in_progress": false,
+       "_id": "bbe81308-ef7c-4c0c-b684-385fd627d99e",
+       "config": {
+         "num_units": "5",
+         "write_files": "true"
+       },
+       "id": "harness_importer"
+     }
+   ],
+   "id": "harness_repo_1"
+ }
+]
+==========================================================================================================================================
+Retrieve Importers Associated with a Repository
+Retrieves the importer (if any) associated with a repository. The array will either be empty (no importer configured) or contain a single entry.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/importers/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - containing an array of importers
+404 - if there is no repository with the given ID; this will not occur if the repository exists but has no associated importers
+Return: database representation of the repository’s importer or an empty list
+Sample 200 Response Body:
+
+[
+   {
+       "_href": "/pulp/api/v2/repositories/zoo/importers/yum_importer/",
+       "_id": {
+           "$oid": "563c82fa45ef48043f026c32"
+       },
+       "_ns": "repo_importers",
+       "config": {
+           "feed": "http://example.com/repos/zoo/"
+       },
+       "id": "yum_importer",
+       "importer_type_id": "yum_importer",
+       "last_sync": "2015-11-06T10:38:23Z",
+       "repo_id": "zoo",
+       "scratchpad": {
+           "repomd_revision": 1331832478
+       }
+   }
+]
+==========================================================================================================================================
+Retrieve an Importer Associated with a Repository
+Retrieves the given importer (if any) associated with a repository.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/importers/<importer_id>/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - containing the details of the importer
+404 - if there is either no repository or importer with a matching ID.
+Return: database representation of the repository’s importer
+Sample 200 Response Body:
+
+{
+   "_href": "/pulp/api/v2/repositories/zoo/importers/yum_importer/",
+   "_id": {
+       "$oid": "563c82fa45ef48043f026c32"
+   },
+   "_ns": "repo_importers",
+   "config": {
+       "feed": "http://example.com/repos/zoo/"
+   },
+   "id": "yum_importer",
+   "importer_type_id": "yum_importer",
+   "last_sync": "2015-11-06T10:38:23Z",
+   "repo_id": "zoo",
+   "scratchpad": {
+       "repomd_revision": 1331832478
+   }
+}
+==========================================================================================================================================
+Retrieve Distributors Associated with a Repository
+Retrieves all distributors associated with a repository. If the repository has no associated distributors, an empty array is returned.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/distributors/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - containing an array of distributors
+404 - if there is no repository with the given ID; this will not occur if the repository exists but has no associated distributors
+Return: database representations of all distributors on the repository
+Sample 200 Response Body:
+
+[
+ {
+   "scratchpad": 1,
+   "_ns": "repo_distributors",
+   "last_publish": "2012-01-25T15:26:32Z",
+   "auto_publish": false,
+   "distributor_type_id": "harness_distributor",
+   "repo_id": "harness_repo_1",
+   "publish_in_progress": false,
+   "_id": "addf9261-345e-4ce3-ad1e-436ba005287f",
+   "config": {
+     "publish_dir": "/tmp/harness-publish",
+     "write_files": "true"
+   },
+   "id": "dist_1"
+ }
+]
+==========================================================================================================================================
+Retrieve a Distributor Associated with a Repository
+Retrieves a single distributors associated with a repository.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/distributors/<distributor_id>/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - containing the details of a distributors
+404 - if there is either no repository or distributor with a matching ID.
+Return: database representation of the distributor
+Sample 200 Response Body:
+
+{
+  "scratchpad": 1,
+  "_ns": "repo_distributors",
+  "last_publish": "2012-01-25T15:26:32Z",
+  "auto_publish": false,
+  "distributor_type_id": "harness_distributor",
+  "repo_id": "harness_repo_1",
+  "publish_in_progress": false,
+  "_id": {"$oid": "addf9261-345e-4ce3-ad1e-436ba005287f"},
+  "config": {
+    "publish_dir": "/tmp/harness-publish",
+    "write_files": "true"
+  },
+  "id": "dist_1"
+}
+==========================================================================================================================================
+Listing All Scheduled Syncs
+All of the scheduled syncs for a given importer may be listed.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/importers/<importer_id>/schedules/sync/
+Permission: read
+Response Codes:
+200 - if repo, importer exist
+404 - if there is no repository or importer with the specified IDs
+Return: array of schedule reports for all scheduled syncs defined
+Sample 200 Response Body:
+
+[
+   {
+       "_href": "/pulp/api/v2/repositories/test/importers/yum_importer/schedules/sync/54d8852245ef4876fade7cc2/",
+       "_id": "54d8852245ef4876fade7cc2",
+       "args": [
+           "test"
+       ],
+       "consecutive_failures": 0,
+       "enabled": true,
+       "failure_threshold": null,
+       "first_run": "2015-02-09T10:00:02Z",
+       "kwargs": {
+           "overrides": {}
+       },
+       "last_run_at": "2015-02-09T10:00:23Z",
+       "last_updated": 1423476133.825821,
+       "next_run": "2015-02-10T10:00:02Z",
+       "remaining_runs": null,
+       "resource": "pulp:importer:test:yum_importer",
+       "schedule": "P1DT",
+       "task": "pulp.server.tasks.repository.sync_with_auto_publish",
+       "total_run_count": 1
+   }
+]
+==========================================================================================================================================
+Listing a Single Scheduled Sync
+Each scheduled sync may be inspected.
+
+Method: GET
+Permission: read
+Path: /pulp/api/v2/repositories/<repo_id>/importers/<importer_id>/schedules/sync/<schedule_id>/
+Response Codes:
+200 - if repo, importer, schedule exist
+404 - if there is no repository, importer or schedule with the specified IDs
+Return: a schedule report for the scheduled sync
+Sample 200 Response Body:
+
+{
+   "_href": "/pulp/api/v2/repositories/test/importers/yum_importer/schedules/sync/54d8852245ef4876fade7cc2/",
+   "_id": "54d8852245ef4876fade7cc2",
+   "args": [
+       "test"
+   ],
+   "consecutive_failures": 0,
+   "enabled": true,
+   "failure_threshold": null,
+   "first_run": "2015-02-09T10:00:02Z",
+   "kwargs": {
+       "overrides": {}
+   },
+   "last_run_at": "2015-02-09T10:00:23Z",
+   "last_updated": 1423476133.825821,
+   "next_run": "2015-02-10T10:00:02Z",
+   "remaining_runs": null,
+   "resource": "pulp:importer:test:yum_importer",
+   "schedule": "P1DT",
+   "task": "pulp.server.tasks.repository.sync_with_auto_publish",
+   "total_run_count": 1
+}
+==========================================================================================================================================
+Retrieving Sync History
+Retrieve sync history for a repository. Each sync performed on a repository creates a history entry.
+
+Method: GET
+Permission: read
+Path: /pulp/api/v2/repositories/<repo_id>/history/sync/
+Query Parameters:
+limit (integer) - (optional) the maximum number of history entries to return; if not specified, the entire history is returned
+sort (string) - (optional) options are ‘ascending’ and ‘descending’; the array is sorted by the sync timestamp
+start_date (iso8601 datetime) - (optional) any entries with a timestamp prior to the given date are not returned
+end_date (iso8601 datetime) - (optional) any entries with a timestamp after the given date are not returned
+Response Codes:
+200 - if the history was successfully retrieved
+404 - if the repository id given does not exist
+Return: an array of sync history entries
+Sample 200 Response Body:
+
+[
+ {
+  "result": "success",
+  "importer_id": "my_demo_importer",
+  "exception": null,
+  "repo_id": "demo_repo",
+  "traceback": null,
+  "started": "1970:00:00T00:00:00Z",
+  "completed": "1970:00:00T00:00:01Z",
+  "importer_type_id": "demo_importer",
+  "error_message": null,
+ }
+]
+==========================================================================================================================================
+Listing All Scheduled Publishes
+All of the scheduled publishes for a given distributor may be listed.
+
+Method: GET
+Path: /pulp/api/v2/repositories/<repo_id>/distributors/<distributor_id>/schedules/publish/
+Permission: read
+Response Codes:
+200 - if repo, distributor exist
+404 - if there is no repository or distributor with the specified IDs
+Return: array of schedule reports for all scheduled publishes defined (see sample response of Scheduling a Publish for details)
+Sample 200 Response Body:
+
+{
+    "_href": "/pulp/api/v2/repositories/test/distributors/yum_distributor/schedules/publish/54d88df045ef4876fb50c994/",
+    "_id": "54d88df045ef4876fb50c994",
+    "args": [
+        "test",
+        "yum_distributor"
+    ],
+    "consecutive_failures": 0,
+    "enabled": true,
+    "failure_threshold": null,
+    "first_run": "2015-02-09T10:37:36Z",
+    "kwargs": {
+        "overrides": {}
+    },
+    "last_run_at": "2015-02-09T10:38:23Z",
+    "last_updated": 1423478256.805917,
+    "next_run": "2015-02-10T10:37:36Z",
+    "remaining_runs": null,
+    "resource": "pulp:distributor:test:yum_distributor",
+    "schedule": "P1DT",
+    "task": "pulp.server.tasks.repository.publish",
+    "total_run_count": 1
+}
+==========================================================================================================================================
+Listing a Single Scheduled Publish
+Each scheduled publish may be inspected.
+
+Method: GET
+Permission: read
+Path: /pulp/api/v2/repositories/<repo_id>/distributors/<distributor_id>/schedules/publish/<schedule_id>/
+Response Codes:
+200 - if repo, distributor or schedule exist
+404 - if there is no repository, distributor or schedule with the specified IDs
+Return: a schedule report for the scheduled publish (see sample response of Scheduling a Publish for details)
+Sample 200 Response Body:
+
+{
+   "_href": "/pulp/api/v2/repositories/test/distributors/yum_distributor/schedules/publish/54d88df045ef4876fb50c994/",
+   "_id": "54d88df045ef4876fb50c994",
+   "args": [
+       "test",
+       "yum_distributor"
+   ],
+   "consecutive_failures": 0,
+   "enabled": true,
+   "failure_threshold": null,
+   "first_run": "2015-02-09T10:37:36Z",
+   "kwargs": {
+       "overrides": {}
+   },
+   "last_run_at": "2015-02-09T10:38:23Z",
+   "last_updated": 1423478256.805917,
+   "next_run": "2015-02-10T10:37:36Z",
+   "remaining_runs": null,
+   "resource": "pulp:distributor:test:yum_distributor",
+   "schedule": "P1DT",
+   "task": "pulp.server.tasks.repository.publish",
+   "total_run_count": 1
+}
+==========================================================================================================================================
+Retrieving Publish History
+Retrieve publish history for a repository. Each publish performed on a repository creates a history entry.
+
+Method: GET
+Permission: read
+Path: /pulp/api/v2/repositories/<repo_id>/history/publish/<distributor_id>/
+Query Parameters:
+limit (integer) - (optional) the maximum number of history entries to return; if not specified, the entire history is returned
+sort (string) - (optional) options are ‘ascending’ and ‘descending’; the array is sorted by the publish timestamp
+start_date (iso8601 datetime) - (optional) any entries with a timestamp prior to the given date are not returned
+end_date (iso8601 datetime) - (optional) any entries with a timestamp after the given date are not returned
+Response Codes:
+200 - if the history was successfully retrieved
+404 - if the repository id given does not exist
+Return: an array of publish history entries
+Sample 200 Response Body:
+
+[
+ {
+  "result": "success",
+  "distributor_id": "my_demo_distributor",
+  "distributor_type_id": "demo_distributor",
+  "exception": null,
+  "repo_id": "demo_repo",
+  "traceback": null,
+  "started": "1970:00:00T00:00:00Z",
+  "completed": "1970:00:00T00:00:01Z",
+  "error_message": null,
+ }
+]
+==========================================================================================================================================
+Retrieve a Single Repository Group
+Retrieves information on a single repository group.
+
+Method: GET
+Path: /pulp/api/v2/repo_groups/<group_id>/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - if the repository group is found
+404 - if the group cannot be found
+Return: database representation of the matching repository group
+Sample 200 Response Body:
+
+{
+ "scratchpad": null,
+ "display_name": "Demo Group",
+ "description": null,
+ "_ns": "repo_groups",
+ "notes": {},
+ "repo_ids": [
+   "dest-2"
+ ],
+ "_id": {
+   "$oid": "500ee4028a905b04e900002e"
+ },
+ "id": "demo-group",
+ "_href": "/pulp/api/v2/repo_groups/demo-group/"
+}
+==========================================================================================================================================
+Retrieve All Repository Groups
+Retrieves information on all repository groups in the Pulp server. This call will never return a 404; an empty array is returned in the event there are no groups defined.
+
+This call supports the search query parameters as described in the search API conventions.
+
+Method: GET
+Path: /pulp/api/v2/repo_groups/
+Permission: read
+Query Parameters:
+Response Codes:
+200 - containing the array of repository groups
+Return: array of groups in the same format as retrieving a single group; empty array if there are none defined
+Sample 200 Response Body:
+
+[
+ {
+   "scratchpad": null,
+   "display_name": null,
+   "description": null,
+   "_ns": "repo_groups",
+   "notes": {},
+   "repo_ids": [],
+   "_id": {
+     "$oid": "500ead8a8a905b04e9000019"
+   },
+   "id": "g1",
+   "_href": "/pulp/api/v2/repo_groups/g1/"
+ },
+ {
+   "scratchpad": null,
+   "display_name": "Demo Group",
+   "description": null,
+   "_ns": "repo_groups",
+   "notes": {},
+   "repo_ids": [
+     "dest-2"
+   ],
+   "_id": {
+     "$oid": "500ee4028a905b04e900002e"
+   },
+   "id": "demo-group",
+   "_href": "/pulp/api/v2/repo_groups/demo-group/"
+ }
+]
+==========================================================================================================================================
+List Repository Group Distributors
+Retrieves all distributors associated with a given group
+
+Method: GET
+Path: /pulp/api/v2/repo_groups/<group_id>/distributors/
+Permission: read
+Response Codes:
+200 - if the group exists
+Return: an array of objects that represent distributors
+Sample 200 Response Body: :
+
+[
+ {
+   "scratchpad": null,
+   "repo_group_id": "test_group",
+   "_ns": "repo_group_distributors",
+   "last_publish": "2014-06-12T14:38:05Z",
+   "distributor_type_id": "group_test_distributor",
+   "_id": {
+     "$oid": "5399f38b7bc8f60c78d856bf"
+   },
+   "config": {
+     "config_value1": false,
+     "config_value2": true
+   },
+   "id": "2a146bdf-384b-4951-987e-8d42c7c4317f",
+   "_href": "2a146bdf-384b-4951-987e-8d42c7c4317f"
+ }
+]
+==========================================================================================================================================
+Retrieve a Repository Group Distributor
+Retrieve a specific distributor that is associated with a group.
+
+Method: GET
+Path: /pulp/api/v2/repo_groups/<group_id>/distributors/<distributor_id>/
+Permission: read
+Response Codes:
+200 - containing an object representing the distributor
+404 - if either the group_id or the distributor_id do not exist on the server
+Return: an object that represents the specified distributor
+Sample 200 Response Body: :
+
+{
+ "scratchpad": null,
+ "repo_group_id": "test_group",
+ "_ns": "repo_group_distributors",
+ "last_publish": null,
+ "distributor_type_id": "group_test_distributor",
+ "_id": {
+   "$oid": "5399fb527bc8f60c77d7c82a"
+ },
+ "config": {
+   "config_value1": false,
+   "config_value2": true
+ },
+ "id": "test_id",
+ "_href": "/pulp/api/v2/repo_groups/test_group/distributors/test_id/"
+}
+==========================================================================================================================================
+List All Upload Requests
+Returns an array of IDs for all upload requests currently in the server.
+
+Method: GET
+Path: /pulp/api/v2/content/uploads/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - for a successful lookup
+Return: array of IDs for all upload requests on the server; empty array if there are none
+Sample 200 Response Body:
+
+{
+ "upload_ids': ["cfb1fed0-752b-439e-aa68-fba68eababa3"]
+}
+==========================================================================================================================================
+View All Orphaned Content
+Get a summary view of the orphaned units by content type
+
+Method: GET
+Path: /pulp/api/v2/content/orphans/
+Permission: read
+Response Codes:
+200 - even if no orphaned content is found
+Return: summary of orphaned packages by content type
+Sample 200 Response Body:
+
+{
+ {'rpm': {'count': 21,
+          '_href': '/pulp/api/v2/content/orphans/rpm/'},
+ {'drpm': {'count': 0,
+           '_href': '/pulp/api/v2/content/orphans/drpm/'},
+}
+==========================================================================================================================================
+View Orphaned Content by Type
+List all the orphaned content of a particular content type.
+
+Method: GET
+Path: /pulp/api/v2/content/orphans/<content_type_id>/
+Permission: read
+Response Codes:
+200 - even if no orphaned content is found
+404 - if the content type does not exist
+Return: (possibly empty) array of content units
+Sample 200 Response Body:
+
+{
+ [
+ {'_content_type_id': 'rpm',
+  '_href': '/pulp/api/v2/content/orphans/rpm/d0dc2044-1edc-4298-bf10-a472ea943fe1/',
+  '_id': 'd0dc2044-1edc-4298-bf10-a472ea943fe1',
+  '_ns': 'units_rpm',
+  '_storage_path': '/var/lib/pulp/content/rpm/.//gwt/2.3.0/1.fc16/noarch/c55f30d742a5dade6380a499df9fbf5e6bf35a316acf3774b261592cc8e547d5/gwt-2.3.0-1.fc16.noarch.rpm',
+  'arch': 'noarch',
+  'buildhost': 'localhost',
+  'checksum': 'c55f30d742a5dade6380a499df9fbf5e6bf35a316acf3774b261592cc8e547d5',
+  'checksumtype': 'sha256',
+  'description': 'Writing web apps today is a tedious and error-prone process.  Developers can\nspend 90% of their time working around browser quirks. In addition, building,\nreusing, and maintaining large JavaScript code bases and AJAX components can be\ndifficult and fragile. Google Web Toolkit (GWT) eases this burden by allowing\ndevelopers to quickly build and maintain complex yet highly performant\nJavaScript front-end applications in the Java programming language.',
+  'epoch': '0',
+  'filename': 'gwt-2.3.0-1.fc16.noarch.rpm',
+  'license': 'ASL 2.0',
+  'name': 'gwt',
+  'relativepath': 'gwt-2.3.0-1.fc16.noarch.rpm',
+  'release': '1.fc16',
+  'vendor': '',
+  'version': '2.3.0'},
+ {'_content_type_id': 'rpm',
+  '_href': '/pulp/api/v2/content/orphans/rpm/5b8982b3-1d57-4822-92e5-effa0d4f0a17/',
+  '_id': '5b8982b3-1d57-4822-92e5-effa0d4f0a17',
+  '_ns': 'units_rpm',
+  '_storage_path': '/var/lib/pulp/content/rpm/.//gwt-javadoc/2.3.0/1.fc16/noarch/00da925d1a828f7e3985683ff68043523fe42ec3f1030f449cfddcc5854f6de1/gwt-javadoc-2.3.0-1.fc16.noarch.rpm',
+  'arch': 'noarch',
+  'buildhost': 'localhost',
+  'checksum': '00da925d1a828f7e3985683ff68043523fe42ec3f1030f449cfddcc5854f6de1',
+  'checksumtype': 'sha256',
+  'description': 'Javadoc for gwt.',
+  'epoch': '0',
+  'filename': 'gwt-javadoc-2.3.0-1.fc16.noarch.rpm',
+  'license': 'ASL 2.0',
+  'name': 'gwt-javadoc',
+  'relativepath': 'gwt-javadoc-2.3.0-1.fc16.noarch.rpm',
+  'release': '1.fc16',
+  'vendor': '',
+  'version': '2.3.0'},
+ {'_content_type_id': 'rpm',
+  '_href': '/pulp/api/v2/content/orphans/rpm/228762de-9762-4384-b41a-4ccc594467f9/',
+  '_id': '228762de-9762-4384-b41a-4ccc594467f9',
+  '_ns': 'units_rpm',
+  '_storage_path': '/var/lib/pulp/content/rpm/.//autotest/0.13.0/6.fc16/noarch/1c0009934068204b3937e49966b987ae925924b0922656640f39bcd0e85d52cd/autotest-0.13.0-6.fc16.noarch.rpm',
+  'arch': 'noarch',
+  'buildhost': 'localhost',
+  'checksum': '1c0009934068204b3937e49966b987ae925924b0922656640f39bcd0e85d52cd',
+  'checksumtype': 'sha256',
+  'description': u"Autotest is a framework for fully automated testing. It is designed primarily\nto test the Linux kernel, though it is useful for many other functions such as\nqualifying new hardware. It's an open-source project under the GPL and is used\nand developed by a number of organizations, including Google, IBM, and many\nothers.\n\nThe autotest package provides the client harness capable of running autotest\njobs on a single system.",
+  'epoch': '0',
+  'filename': 'autotest-0.13.0-6.fc16.noarch.rpm',
+  'license': 'GPLv2 and BSD and LGPLv2.1+',
+  'name': 'autotest',
+  'relativepath': 'autotest-0.13.0-6.fc16.noarch.rpm',
+  'release': '6.fc16',
+  'vendor': '',
+  'version': '0.13.0'},
+ ]
+}
+The individual fields of the content units returned will vary by type. The above sample is provided as a demonstration only and does not necessarily reflect the exact return types of all calls. However all fields beginning with a _ will be available in all content units, regardless of type.
+
+View an Individual Orphaned Content Unit
+Retrieve an individual orphaned content unit by content type and content id.
+
+Method: GET
+Path: /pulp/api/v2/content/orphans/<content_type_id>/<content_unit_id>/
+Permission: read
+Response Codes:
+200 - if the orphaned content unit is found
+404 - if the orphaned content unit does not exist
+Return: content unit
+==========================================================================================================================================
+Retrieve a Single Unit
+Returns information about a single content unit.
+
+Method: GET
+Path: /pulp/api/v2/content/units/<content_type>/<unit_id>/
+Permission: read
+Response Codes:
+200 - if the unit is found
+404 - if there is no unit at the given id
+Return: the details of the unit
+Sample 200 Response Body:
+
+{
+  "_id": "046ca98d-5977-400d-b4de-a5bb57c8b7e2",
+  "_content_type_id": "type-2",
+  "_last_updated": "2013-09-05T17:49:41Z",
+  "_storage_path": "/var/lib/pulp/content/type-2/A",
+  "pulp_user_metadata": {},
+  "key-2a": "A",
+  "key-2b": "B",
+}
+==========================================================================================================================================
+Retrieve a Single Unit’s User Metadata
+Returns the pulp_user_metadata field from a single content unit.
+
+Method: GET
+Path: /pulp/api/v2/content/units/<content_type>/<unit_id>/pulp_user_metadata/
+Permission: read
+Response Codes:
+200 - if the unit is found
+404 - if there is no unit at the given id
+Return: the Unit’s pulp_user_metadata field
+Sample 200 Response Body:
+
+{
+  "user_key_1": "A",
+  "user_key_2": "B"
+}
+==========================================================================================================================================
+Search for Units
+Please see Search API for more details on how to perform these searches.
+
+Returns information on content units in the Pulp server that match your search parameters. It is worth noting that this call will never return a 404; an empty array is returned in the case where there are no content units. This is even the case when the content type specified in the URL does not exist.
+This method is slightly more limiting than the POST alternative, because some filter expressions may not be serializable as query parameters.
+
+Method: GET
+Path: /pulp/api/v2/content/units/<content_type>/search/
+Permission: read
+Query Parameters: query params should match the attributes of a Criteria object as defined in Search Criteria. For example: /v2/content/units/deb/search/?field=id&field=display_name&limit=20’
+include_repos (boolean) - (optional) adds an extra per-unit attribute “repository_memberships” that lists IDs of repositories of which the unit is a member.
+Response Codes:
+200 - containing the array of content units
+Return: the same format as retrieving a single content unit, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+  {
+    "key-2a": "A",
+    "_ns": "units_type-2",
+    "_id": "046ca98d-5977-400d-b4de-a5bb57c8b7e2",
+    "pulp_user_metadata": {},
+    "key-2b": "A",
+    "_content_type_id": "type-2",
+    "repository_memberships": ["repo1", "repo2"]
+  },
+  {
+    "key-2a": "B",
+    "_ns": "units_type-2",
+    "_id": "2cc5b44a-c5d7-4751-9505-c54ad4f43497",
+    "pulp_user_metadata": {},
+    "key-2b": "C",
+    "_content_type_id": "type-2",
+    "repository_memberships": ["repo1"]
+  }
+]
+==========================================================================================================================================
+List All Sources
+Get all content sources.
+
+Method: GET
+Path: /pulp/api/v2/content/sources/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - on success
+Return: a list of content source objects; empty array if there are none
+Sample 200 Response Body:
+
+[
+  {
+    "paths": "el7-x86_64/ pulp-el7-x86_64/",
+    "name": "Local Content",
+    "type": "yum",
+    "ssl_validation": "true",
+    "expires": "3d",
+    "enabled": "1",
+    "base_url": "file:///opt/content/disk/",
+    "priority": "0",
+    "source_id": "disk",
+    "max_concurrent": "2",
+    "_href": "/pulp/api/v2/content/sources/disk/"
+  }
+]
+==========================================================================================================================================
+Get Source By ID
+Get a content source by ID.
+
+Method: GET
+Path: /pulp/api/v2/content/sources/<source-id>/
+Permission: read
+Query Parameters: None
+Response Codes:
+200 - on success
+404 - if source-id does not exist
+Return: the requested content source object
+Sample 200 Response Body:
+
+{
+"paths": "el7-x86_64/ pulp-el7-x86_64/",
+"name": "Local Content",
+"type": "yum",
+"ssl_validation": "true",
+"expires": "3d",
+"enabled": "1",
+"base_url": "file:///opt/content/disk/",
+"priority": "0",
+"source_id": "disk",
+"max_concurrent": "2",
+"_href": "/pulp/api/v2/content/sources/disk/"
+}
+==========================================================================================================================================
+Polling Task Progress
+Poll a task for progress and result information for the asynchronous call it is executing. Polling returns a Task Report
+
+Method: GET
+Path: /pulp/api/v2/tasks/<task_id>/
+Permission: read
+Response Codes:
+200 - if the task is found
+404 - if the task is not found
+Return: a Task Report representing the task queried
+==========================================================================================================================================
+Listing Tasks
+All currently running and waiting tasks may be listed. This returns an array of Task Report instances. the array can be filtered by tags.
+
+Method: GET
+Path: /pulp/api/v2/tasks/
+Permission: read
+Query Parameters:
+tag (string) - (optional) only return tasks tagged with all tag parameters
+Response Codes:
+200 - containing an array of tasks
+Return: array of Task Report
+==========================================================================================================================================
+Searching for Tasks
+API callers may also search for tasks. This uses a search criteria document.
+
+Method: GET
+Path: /pulp/api/v2/tasks/search/
+Permission: read
+Query Parameters: query params should match the attributes of a Criteria object as defined in Search Criteria. The exception is that field names should be specified in singular form with as many ‘field=foo’ pairs as needed.
+For example:
+
+/pulp/api/v2/tasks/search/?field=id&field=task_type&limit=20
+Response Codes:
+200 - containing the array of tasks.
+==========================================================================================================================================
+Polling Task Group Progress
+Poll a group of tasks for progress summary. Polling returns a Cancelling Tasks in a Task Group
+
+Method: GET
+Path: /pulp/api/v2/task_groups/<task_group_id>/state_summary/
+Permission: read
+Response Codes:
+200 - if the task group is found
+404 - if the task group id is not found
+Return: a Cancelling Tasks in a Task Group summarizing the state of all tasks belonging to queried task group id
+==========================================================================================================================================
+Retrieve All Event Listeners
+Returns an array of all event listeners in the server.
+
+Method: GET
+Path: /pulp/api/v2/events/
+Permission: read
+Response Codes:
+200 - array of event listeners, empty array if there are none
+Return: database representation of each event listener
+Sample 200 Response Body:
+
+[
+ {
+   "_href": "/pulp/api/v2/events/4ff708048a905b7016000008/",
+   "_id": {"$oid": "4ff708048a905b7016000008"},
+   "_ns": "event_listeners",
+   "event_types": [
+     "repo.sync.finish",
+     "repo.publish.finish"
+   ],
+   "id": "4ff708048a905b7016000008",
+   "notifier_config": {
+     "url": "http://localhost/api"
+   },
+   "notifier_type_id": "http"
+ }
+]
+==========================================================================================================================================
+Retrieve a single Event Listener
+Returns a single event listener from the server.
+
+Method: GET
+Path: /pulp/api/v2/events/<event_listener_id>/
+Permission: read
+Response Codes:
+200 - the event listener detail
+404 - if the given event listener does not exist
+Return: database representation of the event listener
+Sample 200 Response Body:
+
+{
+ "_href": "/pulp/api/v2/events/4ff708048a905b7016000008/",
+ "_id": {"$oid": "4ff708048a905b7016000008"},
+ "_ns": "event_listeners",
+ "event_types": [
+   "repo.sync.finish",
+   "repo.publish.finish"
+ ],
+ "id": "4ff708048a905b7016000008",
+ "notifier_config": {
+   "url": "http://localhost/api"
+ },
+ "notifier_type_id": "http"
+}
+==========================================================================================================================================
+Retrieve a Single User
+Retrieves information on a single Pulp user. The returned data includes general user details.
+
+Method: GET
+Path: /pulp/api/v2/users/<user_login>/
+Permission: read
+Query Parameters:
+Response Codes:
+200 - if the user exists
+404 - if no user exists with the given ID
+Return: database representation of the matching user excluding user password
+Sample 200 Response Body:
+
+{
+ "name": "admin",
+ "roles": [
+   "super-users"
+ ],
+ "_ns": "users",
+ "login": "admin",
+ "_id": {
+   "$oid": "502c47ace5e7100b0a000008"
+ },
+ "id": "502c47ace5e7100b0a000008",
+ "_href": "/pulp/api/v2/users/admin/"
+}
+==========================================================================================================================================
+Retrieve All Users
+Returns information on all users in the Pulp server. An empty array is returned in the case where there are no users.
+
+Method: GET
+Path: /pulp/api/v2/users/
+Permission: read
+Query Parameters:
+Response Codes:
+200 - containing the array of users
+Return: the same format as retrieving a single user, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+ {
+   "name": "admin",
+   "roles": [
+     "super-users"
+   ],
+   "_ns": "users",
+   "login": "admin",
+   "_id": {
+     "$oid": "502c47ace5e7100b0a000008"
+   },
+   "id": "502c47ace5e7100b0a000008",
+   "_href": "/pulp/api/v2/users/admin/"
+ },
+ {
+   "name": "test name",
+   "roles": [],
+   "_ns": "users",
+   "login": "test-login",
+   "_id": {
+     "$oid": "502c8c08e5e7100b0a000049"
+   },
+   "id": "502c8c08e5e7100b0a000049",
+   "_href": "/pulp/api/v2/users/test-login/"
+ }
+]
+==========================================================================================================================================
+Retrieve a Single Role
+Retrieves information on a single Role. The returned data includes general role details.
+
+Method: GET
+Path: /pulp/api/v2/roles/<role_id>/
+Permission: read
+Query Parameters:
+Response Codes:
+200 - if the role exists
+404 - if no role exists with the given ID
+Return: database representation of the matching role
+Sample 200 Response Body:
+
+{
+ "display_name": "Super Users",
+ "description": "Role indicates users with admin privileges",
+ "_ns": "roles",
+ "_href": "/pulp/api/v2/roles/super-users/",
+ "users": [
+   "admin"
+ ],
+ "_id": {
+   "$oid": "502ca7afe5e7106ef1000007"
+ },
+ "id": "super-users",
+ "permissions": {
+   "/": [
+     "CREATE",
+     "READ",
+     "UPDATE",
+     "DELETE",
+     "EXECUTE"
+   ]
+ }
+}
+==========================================================================================================================================
+Retrieve All Roles
+Returns information on all the roles. An empty array is returned in the case where there are no roles.
+
+Method: GET
+Path: /pulp/api/v2/roles/
+Permission: read
+Query Parameters:
+Response Codes:
+200 - containing the array of roles
+Return: the same format as retrieving a single role, except the base of the return value is an array of them
+Sample 200 Response Body:
+
+[
+ {
+   "display_name": "Super Users",
+   "description": "Role indicates users with admin privileges",
+   "_ns": "roles",
+   "_href": "/pulp/api/v2/roles/super-users/",
+   "users": [
+     "admin"
+   ],
+   "_id": {
+     "$oid": "502ca7afe5e7106ef1000007"
+   },
+   "id": "super-users",
+   "permissions": {
+     "/": [
+       "CREATE",
+       "READ",
+       "UPDATE",
+       "DELETE",
+       "EXECUTE"
+     ]
+   }
+ },
+ {
+   "display_name": "test",
+   "description": "foo",
+   "_ns": "roles",
+   "_href": "/pulp/api/v2/roles/test-role1/",
+   "users": [
+     "test-login"
+   ],
+   "_id": {
+     "$oid": "502caa28e5e71073ae000017"
+   },
+   "id": "test-role1",
+   "permissions": {}
+ }
+]
+==========================================================================================================================================
+Retrieve Permissions for particular resource
+If a resource is specified, permissions for the particular resource are returned. In this case the array will contain a single item.
+
+Method: GET
+Path: /pulp/api/v2/permissions/
+Permission: read
+Query Parameters: Resource path URI should be specifield. For example to retrieve permissions for “/v2/actions/login/”: /v2/permissions/?resource=%2Fv2%2Factions%2Flogin%2F
+Response Codes:
+200 - containing the array of permissions for specified resource
+Return: array of database representation of permissions for specified resource
+Sample 200 Response Body:
+
+[
+ {
+    "_id": {
+        "$oid": "546a6ece6754762f1c34b1db"
+    },
+    "_ns": "permissions",
+    "id": "546a6ece6754762f1c34b1db",
+    "resource": "/v2/actions/login/",
+    "users": {
+        "admin": [
+            "READ",
+            "UPDATE"
+        ]
+    }
+ }
+]
+==========================================================================================================================================
+Retrieve Permissions for all resources
+Returns information on permissions for all resources.
+
+Method: GET
+Path: /pulp/api/v2/permissions/
+Permission: read
+Query Parameters:
+Response Codes:
+200 - containing the array of permissions
+Return: array of database representation of permissions
+Sample 200 Response Body:
+
+[
+ {
+   "_ns": "permissions",
+   "_id": {
+     "$oid": "5035917fe5e7106f4100000c"
+   },
+   "resource": "/v2/actions/login/",
+   "id": "5035917fe5e7106f4100000c",
+   "users": {
+     "admin": [
+       "READ",
+       "UPDATE"
+     ]
+   }
+ },
+ {
+   "_ns": "permissions",
+   "_id": {
+     "$oid": "5035917fe5e7106f4100000d"
+   },
+   "resource": "/v2/actions/logout/",
+   "id": "5035917fe5e7106f4100000d",
+   "users": {
+     "admin": [
+       "READ",
+       "UPDATE"
+     ]
+   }
+ },
+ {
+   "_ns": "permissions",
+   "_id": {
+     "$oid": "5035917fe5e7106f41000010"
+   },
+   "resource": "/",
+   "id": "5035917fe5e7106f41000010",
+   "users": {
+     "admin": [
+       "CREATE",
+       "READ",
+       "UPDATE",
+       "DELETE",
+       "EXECUTE"
+     ]
+   }
+ }
+]
+==========================================================================================================================================
+Getting the Server Status
+An unauthenticated resource that shows the current status of the Pulp server. A 200 response shows that the server is up and running. Users of this API may want to examine pulp_messaging_connection, pulp_database_connection and known_workers to get more detailed status information.
+
+Warning
+
+Clustered Pulp installations have additional monitoring concerns. See Cluster Monitoring for more information.
+
+Note
+
+This API is meant to provide an “at-a-glance” status to aid debugging of a Pulp deployment, and is not meant to replace monitoring of Pulp components in a production environment.
+
+A healthy Pulp installation will contain one or more records for “resource_manager”, one or more records for “scheduler”, and one or more records for “reserved_resource_worker” in the worker list. It will also have messaging_connection and database_connection entries that contain {connected: True}. Note that if the scheduler is not running, other workers may be running but not updating their last heartbeat record.
+
+The version of Pulp is also returned via platform_version in the versions object. This field is calculated from the “pulp-server” python package version. Do not use the deprecated api_version record.
+
+Method: GET
+Path: /pulp/api/v2/status/
+Permission: none
+Response Codes:
+200 - pulp server is up and running
+Return: jSON document showing current server status
+Sample 200 Response Body: :
+
+{
+   "api_version": "2",
+   "database_connection": {
+       "connected": true
+   },
+   "known_workers": [
+       {
+           "last_heartbeat": "2015-01-02T20:39:58Z",
+           "name": "scheduler@status-info-net0.default.virt"
+       },
+       {
+           "last_heartbeat": "2015-01-02T20:40:34Z",
+           "name": "reserved_resource_worker-0@status-info-net0.default.virt"
+       },
+       {
+           "last_heartbeat": "2015-01-02T20:40:36Z",
+           "name": "resource_manager@status-info-net0.default.virt"
+       }
+   ],
+   "messaging_connection": {
+       "connected": true
+   },
+   "versions": {
+       "platform_version": "2.6.0"
+   }
+}
+==========================================================================================================================================
+Retrieve All Content Unit Types
+Queries the server for the loaded content unit type definitions.
+
+Method: GET
+Path: /pulp/api/v2/plugins/types/
+Permission: read
+Response Codes:
+200 - list of loaded content types
+Return: jSON document showing all loaded content unit types
+Sample 200 Response Body: :
+
+[
+   {
+       "_href": "/pulp/api/v2/plugins/types/puppet_module/",
+       "_id": {
+           "$oid": "55a391ea45ef481ffab6ac26"
+       },
+       "_ns": "content_types",
+       "description": "Puppet Module",
+       "display_name": "Puppet Module",
+       "id": "puppet_module",
+       "referenced_types": [],
+       "search_indexes": [
+           "author",
+           "tag_list"
+       ],
+       "unit_key": [
+           "name",
+           "version",
+           "author"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/types/iso/",
+       "_id": {
+           "$oid": "55a391ea45ef481ffab6ac27"
+       },
+       "_ns": "content_types",
+       "description": "ISO",
+       "display_name": "ISO",
+       "id": "iso",
+       "referenced_types": [],
+       "search_indexes": [],
+       "unit_key": [
+           "name",
+           "checksum",
+           "size"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/types/docker_image/",
+       "_id": {
+           "$oid": "55a391ea45ef481ffab6ac28"
+       },
+       "_ns": "content_types",
+       "description": "Docker Image",
+       "display_name": "Docker Image",
+       "id": "docker_image",
+       "referenced_types": [],
+       "search_indexes": [],
+       "unit_key": [
+           "image_id"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/types/rpm/",
+       "_id": {
+           "$oid": "55a391ea45ef481ffab6ac32"
+       },
+       "_ns": "content_types",
+       "description": "RPM",
+       "display_name": "RPM",
+       "id": "rpm",
+       "referenced_types": [
+           "erratum"
+       ],
+       "search_indexes": [
+           "name",
+           "epoch",
+           "version",
+           "release",
+           "arch",
+           "filename",
+           "checksum",
+           "checksumtype",
+           "version_sort_index",
+           [
+               "version_sort_index",
+               "release_sort_index"
+           ]
+       ],
+       "unit_key": [
+           "name",
+           "epoch",
+           "version",
+           "release",
+           "arch",
+           "checksumtype",
+           "checksum"
+       ]
+   }
+]
+==========================================================================================================================================
+Retrieve a Specific Content Unit Type
+Retrieves information about a specific content unit type.
+
+Method: GET
+Path: /pulp/api/v2/plugins/types/<type_id>/
+Permission: read
+Response Codes:
+200 - the content type exists
+404 - the content type does not exist
+Return: jSON document showing queried content unit type
+Sample 200 Response Body: :
+
+{
+   "_href": "/pulp/api/v2/plugins/types/iso/",
+   "_id": {
+       "$oid": "55a391ea45ef481ffab6ac27"
+   },
+   "_ns": "content_types",
+   "description": "ISO",
+   "display_name": "ISO",
+   "id": "iso",
+   "referenced_types": [],
+   "search_indexes": [],
+   "unit_key": [
+       "name",
+       "checksum",
+       "size"
+   ]
+}
+==========================================================================================================================================
+Retrieve All Importer Plugins
+Queries the server for the loaded importer plugins.
+
+Method: GET
+Path: /pulp/api/v2/plugins/importers/
+Permission: read
+Response Codes:
+200 - list of loaded importer plugins
+Return: jSON document showing all loaded importer plugins
+Sample 200 Response Body: :
+
+[
+   {
+       "_href": "/pulp/api/v2/plugins/importers/puppet_importer/",
+       "display_name": "Puppet Importer",
+       "id": "puppet_importer",
+       "types": [
+           "puppet_module"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/importers/yum_importer/",
+       "display_name": "Yum Importer",
+       "id": "yum_importer",
+       "types": [
+           "distribution",
+           "drpm",
+           "erratum",
+           "package_group",
+           "package_category",
+           "rpm",
+           "srpm",
+           "yum_repo_metadata_file",
+           "package_environment"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/importers/nodes_http_importer/",
+       "display_name": "Pulp Nodes HTTP Importer",
+       "id": "nodes_http_importer",
+       "types": [
+           "node",
+           "repository"
+       ]
+   }
+]
+==========================================================================================================================================
+Retrieve a Specific Importer Plugin
+Retrieves information about a specific importer plugin.
+
+Method: GET
+Path: /pulp/api/v2/plugins/importers/<importer_id>/
+Permission: read
+Response Codes:
+200 - the importer id exists
+404 - the importer id does not exist
+Return: jSON document showing queried importer
+Sample 200 Response Body: :
+
+{
+   "_href": "/pulp/api/v2/plugins/importers/puppet_importer/",
+   "display_name": "Puppet Importer",
+   "id": "puppet_importer",
+   "types": [
+       "puppet_module"
+   ]
+}
+==========================================================================================================================================
+Retrieve All Distributor Plugins
+Queries the server for the loaded distributor plugins.
+
+Method: GET
+Path: /pulp/api/v2/plugins/distributors/
+Permission: read
+Response Codes:
+200 - list of loaded distributor plugins
+Return: jSON document showing all loaded distributor plugins
+Sample 200 Response Body: :
+
+[
+   {
+       "_href": "/pulp/api/v2/plugins/distributors/yum_distributor/",
+       "display_name": "Yum Distributor",
+       "id": "yum_distributor",
+       "types": [
+           "rpm",
+           "srpm",
+           "drpm",
+           "erratum",
+           "package_group",
+           "package_category",
+           "distribution",
+           "yum_repo_metadata_file"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/distributors/puppet_distributor/",
+       "display_name": "Puppet Distributor",
+       "id": "puppet_distributor",
+       "types": [
+           "puppet_module"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/distributors/nodes_http_distributor/",
+       "display_name": "Pulp Nodes HTTP Distributor",
+       "id": "nodes_http_distributor",
+       "types": [
+           "node"
+       ]
+   },
+   {
+       "_href": "/pulp/api/v2/plugins/distributors/docker_distributor_web/",
+       "display_name": "Docker Web Distributor",
+       "id": "docker_distributor_web",
+       "types": [
+           "docker_image"
+       ]
+   }
+]
+==========================================================================================================================================
+Retrieve a Specific Distributor Plugin
+Retrieves information about a specific distributor plugin.
+
+Method: GET
+Path: /pulp/api/v2/plugins/distributors/<distributor_id>/
+Permission: read
+Response Codes:
+200 - the distributor id exists
+404 - the distributor id does not exist
+Return: jSON document showing queried distributor
+Sample 200 Response Body: :
+
+{
+   "_href": "/pulp/api/v2/plugins/distributors/yum_distributor/",
+   "display_name": "Yum Distributor",
+   "id": "yum_distributor",
+   "types": [
+       "rpm",
+       "srpm",
+       "drpm",
+       "erratum",
+       "package_group",
+       "package_category",
+       "distribution",
+       "yum_repo_metadata_file"
+   ]
+}
+==========================================================================================================================================
+
