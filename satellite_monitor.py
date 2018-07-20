@@ -5,6 +5,8 @@ import datetime
 import subprocess
 import os
 import re
+import shutil
+import tarfile
 from distutils.dir_util import copy_tree
 
 
@@ -13,7 +15,7 @@ FULL_PATH = '/tmp/gps/satellite-monitor' + DATE + '/'
 DIR = '/tmp/'
 FILE_NAME = 'satellite-monitor' + DATE + '.tar.gz'
 
-class satellite_monitor():
+class Satellite_Monitor():
 
     def __init__(self):
         if not os.path.exists(FULL_PATH):
@@ -34,21 +36,32 @@ class satellite_monitor():
 
     def get_PulpAdmin_Password(self):
         """Store the pulp password"""
-        command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
-        command2 = ['cut', '-d', ' ', '-f2']
-        command3 = ['grep', '^default_password', '/etc/pulp/server.conf']
-        self.line1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
-        self.line2 = subprocess.Popen(command3, stdout=subprocess.PIPE)
-        self.line3 = subprocess.Popen(command2, stdin=self.line1.stdout, stdout=subprocess.PIPE)
-        self.line4 = subprocess.Popen(command2, stdin=self.line2.stdout, stdout=subprocess.PIPE)
-        self.user = self.line3.stdout.read().strip()
-        self.pw = self.line4.stdout.read().strip()
+        file = open('/etc/pulp/server.conf', "r")
+        for line_file in file:
+            if re.findall("^default_password", line_file):
+                fields_line = re.split(":", line_file)
+                pulp_pw = fields_line[1].strip()
+#        command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
+#        command2 = ['cut', '-d', ' ', '-f2']
+#        command3 = ['grep', '^default_password', '/etc/pulp/server.conf']
+#        self.line1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
+#        self.line2 = subprocess.Popen(command3, stdout=subprocess.PIPE)
+#        self.line3 = subprocess.Popen(command2, stdin=self.line1.stdout, stdout=subprocess.PIPE)
+#        self.line4 = subprocess.Popen(command2, stdin=self.line2.stdout, stdout=subprocess.PIPE)
+#        self.user = self.line3.stdout.read().strip()
+#        self.pw = self.line4.stdout.read().strip()
 
     def get_Pulp_Tasks(self):
         """Gather all Pulp Tasks"""
-        tasks = subprocess.Popen('pulp admin -u admin -p ' + self.pw +
+        pulptasks = subprocess.Popen('pulp admin -u admin -p ' + self.pw +
                                     'tasks list')
-        self.write_to_file('pulp_tasks', tasks)
+        self.write_to_file('pulp_tasks', pulptasks)
+
+    def get_Pulp_Status(self):
+        """Gather Pulp status"""
+        pulpstatus = subprocess.Popen('pulp admin -u admin -p ' + self.pw +
+                                        'status')
+        self.write_to_file('pulp_status', pulpstatus)
 
     def get_Celery_Active_Tasks(self):
         """Gather all active celery tasks"""
@@ -58,79 +71,79 @@ class satellite_monitor():
 
     def get_Celery_Scheduled_Tasks(self):
         """Gather all scheduled celery tasks"""
-        schtasks = subprocess.Popen('celery -A pulp.server.async.app \
+        cschtasks = subprocess.Popen('celery -A pulp.server.async.app \
                                         inspect scheduled')
-        self.write_to_file('celery_tasks_scheduled', schtasks)
+        self.write_to_file('celery_tasks_scheduled', cschtasks)
 
     def get_Celery_Reserved_Tasks(self):
         """Gather all reserved celery tasks"""
-        rsvptasks = subprocess.Popen('celery -A pulp.server.async.app \
+        crsvptasks = subprocess.Popen('celery -A pulp.server.async.app \
                                         inspect reserved')
-        self.write_to_file('celery_tasks_reserved', rsvptasks)
+        self.write_to_file('celery_tasks_reserved', crsvptasks)
 
     def get_Celery_Revoked_Tasks(self):
         """Gather all revoked celery tasks"""
-        revoketasks = subprocess.Popen('celery -A pulp.server.async.app \
+        crevoketasks = subprocess.Popen('celery -A pulp.server.async.app \
                                         inspect reserved')
-        self.write_to_file('celery_tasks_revoked', revoketasks)
+        self.write_to_file('celery_tasks_revoked', crevoketasks)
 
     def get_Celery_Registered_Tasks(self):
         """Gather all registered celery tasks"""
-        regtasks = subprocess.Popen('celery -A pulp.server.async.app \
+        cregtasks = subprocess.Popen('celery -A pulp.server.async.app \
                                     inspect registered')
-        self.write_to_file('celery_tasks_registered', regtasks)
+        self.write_to_file('celery_tasks_registered', cregtasks)
 
     def get_Celery_Stats(self):
         """Gather celery stats"""
-        stats = subprocess.Popen('celery -A pulp.server.async.app inspect \
+        cstats = subprocess.Popen('celery -A pulp.server.async.app inspect \
                                     stats')
-        self.write_to_file('celery_stats', stats)
+        self.write_to_file('celery_stats', cstats)
 
     def get_Celery_Active_Queues(self):
         """Gather celery active queues"""
-        activeques = subprocess.Popen('celery -A pulp.server.async.app \
+        cactiveques = subprocess.Popen('celery -A pulp.server.async.app \
                                         inspect active_queues')
-        self.write_to_file('celery_active_queues', activeques)
+        self.write_to_file('celery_active_queues', cactiveques)
 
     def get_Celery_Clock(self):
         """Gather celery clocks"""
-        clocks = subprocess.Popen('celery -A pulp.server.async.app \
+        cclocks = subprocess.Popen('celery -A pulp.server.async.app \
                                     inspect clock')
-        self.write_to_file('celery_clock', clocks)
+        self.write_to_file('celery_clock', cclocks)
     
     def get_Celery_Conf(self):
         """Gather celery configs"""
-        conf = subprocess.Popen('celery -A pulp.server.async.app inspect conf')
-        self.write_to_file('celery_conf', conf)
+        cconf = subprocess.Popen('celery -A pulp.server.async.app inspect conf')
+        self.write_to_file('celery_conf', cconf)
 
     def get_Celery_Memory_Dump(self):
         """Gather celery memory dump"""
-        memdump = subprocess.Popen('celery -A pulp.server.async.app \
+        cmemdump = subprocess.Popen('celery -A pulp.server.async.app \
                                     inspect memdump')
-        self.write_to_file('celery_memory_dump', memdump)
+        self.write_to_file('celery_memory_dump', cmemdump)
 
     def get_Celery_Memory_Sample(self):
         """Gather celery memory sample"""
-        memsamp = subprocess.Popen('celery -A pulp.server.async.app \
+        cmemsamp = subprocess.Popen('celery -A pulp.server.async.app \
                                     inspect memsample')
-        self.write_to_file('celery_memory_sample', memsamp)
+        self.write_to_file('celery_memory_sample', cmemsamp)
 
     def get_Celery_Obj_Graph(self):
         """Gather celery object graph"""
-        objgraph = subprocess.Popen('celery -A pulp.server.async.app \
+        cobjgraph = subprocess.Popen('celery -A pulp.server.async.app \
                                         inspect objgraph')
-        self.write_to_file('celery_objgraph', objgraph)
+        self.write_to_file('celery_objgraph', cobjgraph)
 
     def get_Celery_Ping(self):
         """Gather celery ping"""
-        ping = subprocess.Popen('celery -A pulp.server.async.app inspect ping')
-        self.write_to_file('celery_ping', ping)
+        cping = subprocess.Popen('celery -A pulp.server.async.app inspect ping')
+        self.write_to_file('celery_ping', cping)
 
     def get_Celery_Report(self):
         """Gather celery bugreport"""
-        bug = subprocess.Popen('celery -A pulp.server.async.app \
+        cbug = subprocess.Popen('celery -A pulp.server.async.app \
                                 inspect report')
-        self.write_to_file('celery_bugreport', bug)
+        self.write_to_file('celery_bugreport', cbug)
 
     def get_Qpid_General(self):
         qpidgen = subprocess.Popen('qpid-stat -g --ssl-certificate=/etc/pki/\
@@ -177,7 +190,11 @@ class satellite_monitor():
         mongoresources = subprocess.Popen('mongoexport --db pulp_database \
                                             --collection reserved_resources')
         self.write_to_file('mongo_resources', mongoresources)
-        
+
+    def get_Mongo_Workers(self):
+        mongoworkers = subprocess.Popen('mongoexport --db pulp_database \
+                                            --collection workers')
+        self.write_to_file('mongo_workers', mongoworkers)
 
     def get_SAR_data(self):
         fromdir = '/var/log/sa/'
@@ -195,3 +212,32 @@ class satellite_monitor():
             tar.add('/tmp/gps/', arcname='.')
         if os.path.exists(DIR + FILE_NAME):
             shutil.rmtree('/tmp/gps/')
+
+def main():
+    if os.geteuid() == 0:
+        satmon = Satellite_Monitor()
+        satmon.get_Pulp_Status()
+        satmon.get_Pulp_Tasks()
+        satmon.get_Qpid_Connections()
+        satmon.get_Qpid_Exchanges()
+        satmon.get_Qpid_General()
+        satmon.get_Qpid_Memory()
+        satmon.get_Qpid_Queues()
+        satmon.get_Qpid_Subscriptions()
+        satmon.get_Celery_Active_Queues()
+        satmon.get_Celery_Active_Tasks()
+        satmon.get_Celery_Clock()
+        satmon.get_Celery_Conf()
+        satmon.get_Celery_Memory_Dump()
+        satmon.get_Celery_Memory_Sample()
+        satmon.get_Celery_Obj_Graph()
+        satmon.get_Celery_Ping()
+        satmon.get_Celery_Registered_Tasks()
+        satmon.get_Celery_Report()
+        satmon.get_Celery_Reserved_Tasks()
+        satmon.get_Celery_Revoked_Tasks()
+        satmon.get_Mongo_RSVP_Resource()
+        satmon.get_Mongo_Tasks()
+        satmon.get_Mongo_Workers()
+    else:
+        print("Please run as the root user.")
