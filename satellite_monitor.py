@@ -4,6 +4,8 @@ import yum
 import datetime
 import subprocess
 import os
+import re
+from distutils.dir_util import copy_tree
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -12,6 +14,12 @@ DIR = '/tmp/'
 FILE_NAME = 'satellite-monitor' + DATE + '.tar.gz'
 
 class satellite_monitor():
+
+    def __init__(self):
+        if not os.path.exists(FULL_PATH):
+            os.makedirs(FULL_PATH)
+            os.chdir(FULL_PATH)
+
     
     def verify_pulpadmin_install(self):
         """Check if pulp-admin has been installed"""
@@ -160,12 +168,30 @@ class satellite_monitor():
                                     -b amqps://localhost:5671')
         self.write_to_file('qpid_memory', qpidmem)
 
-    
+    def get_Mongo_Tasks(self):
+        mongotasks = subprocess.Popen('mongoexport --db pulp_database \
+                                        --collection task_status')
+        self.write_to_file('mongo_tasks', mongotasks)
+
+    def get_Mongo_RSVP_Resource(self):
+        mongoresources = subprocess.Popen('mongoexport --db pulp_database \
+                                            --collection reserved_resources')
+        self.write_to_file('mongo_resources', mongoresources)
+        
+
+    def get_SAR_data(self):
+        fromdir = '/var/log/sa/'
+        os.makedirs(FULL_PATH + 'sa/')
+        copy_tree(fromdir, FULL_PATH + 'sa/')
 
     def write_to_file(self, name, content):
         """Write contents to a file"""
-        if not os.path.exists(FULL_PATH):
-            os.makedirs(FULL_PATH)
-            os.chdir(FULL_PATH)
         with open(name, 'w') as file:
             file.write(content)
+
+    def clean_up(self):
+        """Archive all collected data"""
+        with tarfile.open(FILE_NAME, "w:gz") as tar:
+            tar.add('/tmp/gps/', arcname='.')
+        if os.path.exists(DIR + FILE_NAME):
+            shutil.rmtree('/tmp/gps/')
