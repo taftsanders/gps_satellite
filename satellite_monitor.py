@@ -36,20 +36,22 @@ class Satellite_Monitor():
 
     def get_PulpAdmin_Password(self):
         """Store the pulp password"""
-        file = open('/etc/pulp/server.conf', "r")
-        for line_file in file:
-            if re.findall("^default_password", line_file):
-                fields_line = re.split(":", line_file)
-                pulp_pw = fields_line[1].strip()
-#        command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
-#        command2 = ['cut', '-d', ' ', '-f2']
-#        command3 = ['grep', '^default_password', '/etc/pulp/server.conf']
-#        self.line1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
-#        self.line2 = subprocess.Popen(command3, stdout=subprocess.PIPE)
-#        self.line3 = subprocess.Popen(command2, stdin=self.line1.stdout, stdout=subprocess.PIPE)
-#        self.line4 = subprocess.Popen(command2, stdin=self.line2.stdout, stdout=subprocess.PIPE)
-#        self.user = self.line3.stdout.read().strip()
-#        self.pw = self.line4.stdout.read().strip()
+        with open('/etc/pulp/server.conf', 'r') as pulpconfigfile:
+            pulpconfiglines = pulpconfigfile.readlines()
+        # Fetch only the line that starts with 'default_password:'
+        ## This single line with a list comprehension is equivalent to:
+        ## for l in pulpconfiglines:
+        ##     if l.startswith('default_pass'):
+        ##         passwordline = l.strip()
+        passwordline = [ l.strip() for l in pulpconfiglines if l.starstwith('default_password:') ]
+        # List comprehensions return LISTS.
+        # So passwordline is now a one-item LIST like this:
+        #    ['default_password: SOmetHiNgCrAaAazY']
+        # We want the string not the list
+        passwordline = passwordline[0]
+        # Split the string and get the second item
+        pulp_pw = passwordline.split()[1]
+        self.pulp_pw = pulp_pw
 
     def get_Pulp_Tasks(self):
         """Gather all Pulp Tasks"""
