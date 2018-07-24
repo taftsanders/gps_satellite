@@ -8,7 +8,8 @@ import re
 import shutil
 import tarfile
 from distutils.dir_util import copy_tree
-import pdb
+import argparse
+import time
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -264,6 +265,7 @@ class Satellite_Monitor():
 
     def clean_up(self):
         """Archive all collected data"""
+        self.get_SAR_data()
         with tarfile.open(FILE_NAME, "w:gz") as tar:
             tar.add('/tmp/gps/', arcname='.')
         if os.path.exists(DIR + FILE_NAME):
@@ -271,31 +273,76 @@ class Satellite_Monitor():
 
 def main():
     if os.geteuid() == 0:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-i",
+                            "--interval",
+                            help="Interval in which to collect the information",
+                            type=int,
+                            dest=INTERVAL,
+                            action="store_true")
+        parser.add_argument('-c',
+                            '--clean_up',
+                            help='tar up all collected files for export',
+                            action='store_true')
+
+        args = parser.parse_args()
         satmon = Satellite_Monitor()
-        satmon.get_PulpAdmin_Password()
-        satmon.get_Pulp_Status()
-        satmon.get_Pulp_Tasks()
-        satmon.get_Qpid_Connections()
-        satmon.get_Qpid_Exchanges()
-        satmon.get_Qpid_General()
-        satmon.get_Qpid_Memory()
-        satmon.get_Qpid_Queues()
-        satmon.get_Qpid_Subscriptions()
-        satmon.get_Celery_Active_Queues()
-        satmon.get_Celery_Active_Tasks()
-        satmon.get_Celery_Clock()
-        satmon.get_Celery_Conf()
-        satmon.get_Celery_Memory_Dump()
-        satmon.get_Celery_Memory_Sample()
-        satmon.get_Celery_Obj_Graph()
-        satmon.get_Celery_Ping()
-        satmon.get_Celery_Registered_Tasks()
-        satmon.get_Celery_Report()
-        satmon.get_Celery_Reserved_Tasks()
-        satmon.get_Celery_Revoked_Tasks()
-        satmon.get_Mongo_RSVP_Resource()
-        satmon.get_Mongo_Tasks()
-        satmon.get_Mongo_Workers()
+
+        if args.interval:
+            while True:
+                satmon.get_PulpAdmin_Password()
+                satmon.get_Pulp_Status()
+                satmon.get_Pulp_Tasks()
+                satmon.get_Qpid_Connections()
+                satmon.get_Qpid_Exchanges()
+                satmon.get_Qpid_General()
+                satmon.get_Qpid_Memory()
+                satmon.get_Qpid_Queues()
+                satmon.get_Qpid_Subscriptions()
+                satmon.get_Celery_Active_Queues()
+                satmon.get_Celery_Active_Tasks()
+                satmon.get_Celery_Clock()
+                satmon.get_Celery_Conf()
+                satmon.get_Celery_Memory_Dump()
+                satmon.get_Celery_Memory_Sample()
+                satmon.get_Celery_Obj_Graph()
+                satmon.get_Celery_Ping()
+                satmon.get_Celery_Registered_Tasks()
+                satmon.get_Celery_Report()
+                satmon.get_Celery_Reserved_Tasks()
+                satmon.get_Celery_Revoked_Tasks()
+                satmon.get_Mongo_RSVP_Resource()
+                satmon.get_Mongo_Tasks()
+                satmon.get_Mongo_Workers()
+                time.sleep(INTERVAL)
+        elif args.clean_up:
+            satmon.clean_up()
+        else:
+            satmon.get_PulpAdmin_Password()
+            satmon.get_Pulp_Status()
+            satmon.get_Pulp_Tasks()
+            satmon.get_Qpid_Connections()
+            satmon.get_Qpid_Exchanges()
+            satmon.get_Qpid_General()
+            satmon.get_Qpid_Memory()
+            satmon.get_Qpid_Queues()
+            satmon.get_Qpid_Subscriptions()
+            satmon.get_Celery_Active_Queues()
+            satmon.get_Celery_Active_Tasks()
+            satmon.get_Celery_Clock()
+            satmon.get_Celery_Conf()
+            satmon.get_Celery_Memory_Dump()
+            satmon.get_Celery_Memory_Sample()
+            satmon.get_Celery_Obj_Graph()
+            satmon.get_Celery_Ping()
+            satmon.get_Celery_Registered_Tasks()
+            satmon.get_Celery_Report()
+            satmon.get_Celery_Reserved_Tasks()
+            satmon.get_Celery_Revoked_Tasks()
+            satmon.get_Mongo_RSVP_Resource()
+            satmon.get_Mongo_Tasks()
+            satmon.get_Mongo_Workers()
+            satmon.clean_up()
     else:
         print("Please run as the root user.")
 
