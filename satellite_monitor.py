@@ -10,12 +10,14 @@ import tarfile
 from distutils.dir_util import copy_tree
 import argparse
 import time
+import pdb
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 FULL_PATH = '/tmp/gps/satellite-monitor-' + DATE + '/'
 DIR = '/tmp/'
 FILE_NAME = 'satellite-monitor' + DATE + '.tar.gz'
+SAR = '/var/log/sa/'
 
 class Satellite_Monitor():
 
@@ -61,6 +63,7 @@ class Satellite_Monitor():
                      'tasks', 'list']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         pulptasks = output.stdout.read()
+        print('Gather all Pulp Tasks')
         self.write_to_file('pulp_tasks', pulptasks)
 
     def get_Pulp_Status(self):
@@ -68,6 +71,7 @@ class Satellite_Monitor():
         command = ['pulp-admin', '-u', 'admin', '-p', self.pulp_pw, 'status']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         pulpstatus = output.stdout.read()
+        print('Gather Pulp status')
         self.write_to_file('pulp_status', pulpstatus)
 
     def get_Celery_Active_Tasks(self):
@@ -76,6 +80,7 @@ class Satellite_Monitor():
                     'active']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         ctasks = output.stdout.read()
+        print('Gather all active celery tasks')
         self.write_to_file('celery_tasks_active', ctasks)
 
     def get_Celery_Scheduled_Tasks(self):
@@ -84,6 +89,7 @@ class Satellite_Monitor():
                     'scheduled']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cschtasks = output.stdout.read()
+        print('Gather all scheduled celery tasks')
         self.write_to_file('celery_tasks_scheduled', cschtasks)
 
     def get_Celery_Reserved_Tasks(self):
@@ -92,6 +98,7 @@ class Satellite_Monitor():
                     'reserved']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         crsvptasks = output.stdout.read()
+        print('Gather all reserved celery tasks')
         self.write_to_file('celery_tasks_reserved', crsvptasks)
 
     def get_Celery_Revoked_Tasks(self):
@@ -100,6 +107,7 @@ class Satellite_Monitor():
                     'revoked']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         crevoketasks = output.stdout.read()
+        print('Gather all revoked celery tasks')
         self.write_to_file('celery_tasks_revoked', crevoketasks)
 
     def get_Celery_Registered_Tasks(self):
@@ -108,6 +116,7 @@ class Satellite_Monitor():
                     'registered']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cregtasks = output.stdout.read()
+        print('Gather all registered celery tasks')
         self.write_to_file('celery_tasks_registered', cregtasks)
 
     def get_Celery_Stats(self):
@@ -116,6 +125,7 @@ class Satellite_Monitor():
                     'stats']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cstats = output.stdout.read()
+        print('Gather celery stats')
         self.write_to_file('celery_stats', cstats)
 
     def get_Celery_Active_Queues(self):
@@ -124,6 +134,7 @@ class Satellite_Monitor():
                     'active_queues']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cactiveques = output.stdout.read()
+        print('Gather celery active queues')
         self.write_to_file('celery_active_queues', cactiveques)
 
     def get_Celery_Clock(self):
@@ -132,6 +143,7 @@ class Satellite_Monitor():
                     'clock']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cclocks = output.stdout.read()
+        print('Gather celery clocks')
         self.write_to_file('celery_clock', cclocks)
     
     def get_Celery_Conf(self):
@@ -140,6 +152,7 @@ class Satellite_Monitor():
                     'conf']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cconf = output.stdout.read()
+        print('Gather celery configs')
         self.write_to_file('celery_conf', cconf)
 
     def get_Celery_Memory_Dump(self):
@@ -148,6 +161,7 @@ class Satellite_Monitor():
                     'memdump']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cmemdump = output.stdout.read()
+        print('Gather celery memory dump')
         self.write_to_file('celery_memory_dump', cmemdump)
 
     def get_Celery_Memory_Sample(self):
@@ -156,6 +170,7 @@ class Satellite_Monitor():
                     'memsample']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cmemsamp = output.stdout.read()
+        print('Gather celery memory sample')
         self.write_to_file('celery_memory_sample', cmemsamp)
 
     def get_Celery_Obj_Graph(self):
@@ -164,6 +179,7 @@ class Satellite_Monitor():
                     'objgraph']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cobjgraph = output.stdout.read()
+        print('Gather celery object graph')
         self.write_to_file('celery_objgraph', cobjgraph)
 
     def get_Celery_Ping(self):
@@ -171,6 +187,7 @@ class Satellite_Monitor():
         command = ['celery', '-A', 'pulp.server.async.app', 'inspect', 'ping']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cping = output.stdout.read()
+        print('Gather celery ping')
         self.write_to_file('celery_ping', cping)
 
     def get_Celery_Report(self):
@@ -179,81 +196,101 @@ class Satellite_Monitor():
                     'report']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         cbug = output.stdout.read()
+        print('Gather celery bugreport')
         self.write_to_file('celery_bugreport', cbug)
 
     def get_Qpid_General(self):
+        """Gather Qpid General"""
         command = ['qpid-stat', '-g', '--ssl-certificate=\
                     /etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidgen = output.stdout.read()
+        print('Gather Qpid General')
         self.write_to_file('qpid_general', qpidgen)
 
     def get_Qpid_Connections(self):
+        """Gather Qpid Connections"""
         command = ['qpid-stat', '-c', '--ssl-certificate=\
                     /etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidconn = output.stdout.read()
+        print('Gather Qpid Connections')
         self.write_to_file('qpid_connections', qpidconn)
 
     def get_Qpid_Exchanges(self):
+        """Gather Qpid Exchanges"""
         command = ['qpid-stat', '-e', '--ssl-certificate=\
                     /etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidexch = output.stdout.read()
+        print('Gather Qpid Exchanges')
         self.write_to_file('qpid_exchanges', qpidexch)
 
     def get_Qpid_Queues(self):
+        """Gather Qpid Queues"""
         command = ['qpid-stat', '-q', '--ssl-certificate=\
                     /etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidque = output.stdout.read()
+        print('Gather Qpid Queues')
         self.write_to_file('qpid_queue', qpidque)
 
     def get_Qpid_Subscriptions(self):
+        """Gather Qpid Subscriptions"""
         command = ['qpid-stat', '-u', '--ssl-certificate=\
                     /etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidsub = output.stdout.read()
+        print('Gather Qpid Subscriptions')
         self.write_to_file('qpid_subscriptions', qpidsub)
 
     def get_Qpid_Memory(self):
+        """Gather Qpid Memory"""
         command = ['qpid-stat', '-m', '--ssl-certificate=\
                     /etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidmem = output.stdout.read()
+        print('Gather Qpid Memory')
         self.write_to_file('qpid_memory', qpidmem)
 
     def get_Mongo_Tasks(self):
+        """Gather Mongodb Tasks"""
         command = ['mongoexport', '--db', 'pulp_database', '--collection',
                     'task_status']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         mongotasks = output.stdout.read()
+        print('Gather Mongodb Tasks')
         self.write_to_file('mongo_tasks', mongotasks)
 
     def get_Mongo_RSVP_Resource(self):
+        """Gather Mongodb Reserved Resources"""
         command = ['mongoexport', '--db', 'pulp_database', '--collection',
                     'reserved_resources']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         mongoresources = output.stdout.read()
+        print('Gather Mongodb Reserved Resources')
         self.write_to_file('mongo_resources', mongoresources)
 
     def get_Mongo_Workers(self):
+        """Gather Mongodb Workers"""
         command = ['mongoexport', '--db', 'pulp_database', '--collection',
                     'workers']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         mongoworkers = output.stdout.read()
+        print('Gather Mongodb Workers')
         self.write_to_file('mongo_workers', mongoworkers)
 
     def get_SAR_data(self):
-        fromdir = '/var/log/sa/'
-        os.makedirs(FULL_PATH + 'sa/')
-        copy_tree(fromdir, FULL_PATH + 'sa/')
+        if not os.path.exists(SAR):
+            os.makedirs(FULL_PATH + 'sa/')
+            print('Gathering SAR Data')
+            copy_tree(SAR, FULL_PATH + 'sa/')
 
     def write_to_file(self, name, content):
         """Write contents to a file"""
@@ -274,63 +311,74 @@ class Satellite_Monitor():
 
 
 def main():
+#    pdb.set_trace()
     satmon = Satellite_Monitor()
-
-    TASKS = [
-        satmon.get_PulpAdmin_Password(),
-        satmon.get_Pulp_Status(),
-        satmon.get_Pulp_Tasks(),
-        satmon.get_Qpid_Connections(),
-        satmon.get_Qpid_Exchanges(),
-        satmon.get_Qpid_General(),
-        satmon.get_Qpid_Memory(),
-        satmon.get_Qpid_Queues(),
-        satmon.get_Qpid_Subscriptions(),
-        satmon.get_Celery_Active_Queues(),
-        satmon.get_Celery_Active_Tasks(),
-        satmon.get_Celery_Clock(),
-        satmon.get_Celery_Conf(),
-        satmon.get_Celery_Memory_Dump(),
-        satmon.get_Celery_Memory_Sample(),
-        satmon.get_Celery_Obj_Graph(),
-        satmon.get_Celery_Ping(),
-        satmon.get_Celery_Registered_Tasks(),
-        satmon.get_Celery_Report(),
-        satmon.get_Celery_Reserved_Tasks(),
-        satmon.get_Celery_Revoked_Tasks(),
-        satmon.get_Mongo_RSVP_Resource(),
-        satmon.get_Mongo_Tasks(),
-        satmon.get_Mongo_Workers(),
-    ]
-
-    if os.geteuid() == 0:
-        print("Please run as the root user.")
-        return
     parser = argparse.ArgumentParser()
     parser.add_argument("-i",
                         "--interval",
                         type = int,
-                        default = 100,
-                        help="Interval in which to collect the information")
+                        default = 600,
+                        help="Interval in seconds to collect the information")
     parser.add_argument('-c',
                         '--clean_up',
                         help='tar up all collected files for export',
                         action='store_true')
-
     args = parser.parse_args()
-    print args
-
     if args.interval:
         while True:
-            for task in TASKS:
-                task()
+            satmon.get_PulpAdmin_Password()
+            satmon.get_Pulp_Status()
+            satmon.get_Pulp_Tasks()
+            satmon.get_Qpid_Connections()
+            satmon.get_Qpid_Exchanges()
+            satmon.get_Qpid_General()
+            satmon.get_Qpid_Memory()
+            satmon.get_Qpid_Queues()
+            satmon.get_Qpid_Subscriptions()
+            satmon.get_Celery_Active_Queues()
+            satmon.get_Celery_Active_Tasks()
+            satmon.get_Celery_Clock()
+            satmon.get_Celery_Conf()
+            satmon.get_Celery_Memory_Dump()
+            satmon.get_Celery_Memory_Sample()
+            satmon.get_Celery_Obj_Graph()
+            satmon.get_Celery_Ping()
+            satmon.get_Celery_Registered_Tasks()
+            satmon.get_Celery_Report()
+            satmon.get_Celery_Reserved_Tasks()
+            satmon.get_Celery_Revoked_Tasks()
+            satmon.get_Mongo_RSVP_Resource()
+            satmon.get_Mongo_Tasks()
+            satmon.get_Mongo_Workers()
             time.sleep(args.interval)
     elif args.clean_up:
         satmon.clean_up()
     else:
-        for task in TASKS:
-            task()
-            satmon.clean_up()
+        satmon.get_PulpAdmin_Password()
+        satmon.get_Pulp_Status()
+        satmon.get_Pulp_Tasks()
+        satmon.get_Qpid_Connections()
+        satmon.get_Qpid_Exchanges()
+        satmon.get_Qpid_General()
+        satmon.get_Qpid_Memory()
+        satmon.get_Qpid_Queues()
+        satmon.get_Qpid_Subscriptions()
+        satmon.get_Celery_Active_Queues()
+        satmon.get_Celery_Active_Tasks()
+        satmon.get_Celery_Clock()
+        satmon.get_Celery_Conf()
+        satmon.get_Celery_Memory_Dump()
+        satmon.get_Celery_Memory_Sample()
+        satmon.get_Celery_Obj_Graph()
+        satmon.get_Celery_Ping()
+        satmon.get_Celery_Registered_Tasks()
+        satmon.get_Celery_Report()
+        satmon.get_Celery_Reserved_Tasks()
+        satmon.get_Celery_Revoked_Tasks()
+        satmon.get_Mongo_RSVP_Resource()
+        satmon.get_Mongo_Tasks()
+        satmon.get_Mongo_Workers()
+        satmon.clean_up()
 
 if __name__ == '__main__':
     main()
