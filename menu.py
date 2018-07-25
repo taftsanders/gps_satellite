@@ -6,7 +6,7 @@ import satellite_monitor as monitor
 class Menu(object):
     print('Welcome to GPS Satellite. What would you like to do today?')
     option=raw_input('1. Gather Satellite Facts\n\
-                      2. Gather System Facts\n\
+                      2. Monitor Satellite Performance\n\
                       3. Exit')
     if option == '1':
         gps.main()

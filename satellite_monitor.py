@@ -9,7 +9,6 @@ import shutil
 import tarfile
 from distutils.dir_util import copy_tree
 import argparse
-import time
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -313,7 +312,6 @@ def main():
                 satmon.get_Mongo_RSVP_Resource()
                 satmon.get_Mongo_Tasks()
                 satmon.get_Mongo_Workers()
-#                time.sleep(INTERVAL)
         elif args.clean_up:
             satmon.clean_up()
         else:
