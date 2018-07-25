@@ -266,9 +266,10 @@ class Satellite_Monitor():
     def clean_up(self):
         """Archive all collected data"""
         self.get_SAR_data()
+        os.chdir('/tmp')
         with tarfile.open(FILE_NAME, "w:gz") as tar:
             tar.add('/tmp/gps/', arcname='.')
-        if os.path.exists(DIR + FILE_NAME):
+        if os.path.exists(DIR + 'gps/'):
             shutil.rmtree('/tmp/gps/')
 
 def main():
@@ -277,8 +278,6 @@ def main():
         parser.add_argument("-i",
                             "--interval",
                             help="Interval in which to collect the information",
-                            type=int,
-                            dest=INTERVAL,
                             action="store_true")
         parser.add_argument('-c',
                             '--clean_up',
@@ -314,7 +313,7 @@ def main():
                 satmon.get_Mongo_RSVP_Resource()
                 satmon.get_Mongo_Tasks()
                 satmon.get_Mongo_Workers()
-                time.sleep(INTERVAL)
+#                time.sleep(INTERVAL)
         elif args.clean_up:
             satmon.clean_up()
         else:
