@@ -9,6 +9,7 @@ import shutil
 import tarfile
 from distutils.dir_util import copy_tree
 import argparse
+import time
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -271,76 +272,65 @@ class Satellite_Monitor():
         if os.path.exists(DIR + 'gps/'):
             shutil.rmtree('/tmp/gps/')
 
+
 def main():
+    satmon = Satellite_Monitor()
+
+    TASKS = [
+        satmon.get_PulpAdmin_Password(),
+        satmon.get_Pulp_Status(),
+        satmon.get_Pulp_Tasks(),
+        satmon.get_Qpid_Connections(),
+        satmon.get_Qpid_Exchanges(),
+        satmon.get_Qpid_General(),
+        satmon.get_Qpid_Memory(),
+        satmon.get_Qpid_Queues(),
+        satmon.get_Qpid_Subscriptions(),
+        satmon.get_Celery_Active_Queues(),
+        satmon.get_Celery_Active_Tasks(),
+        satmon.get_Celery_Clock(),
+        satmon.get_Celery_Conf(),
+        satmon.get_Celery_Memory_Dump(),
+        satmon.get_Celery_Memory_Sample(),
+        satmon.get_Celery_Obj_Graph(),
+        satmon.get_Celery_Ping(),
+        satmon.get_Celery_Registered_Tasks(),
+        satmon.get_Celery_Report(),
+        satmon.get_Celery_Reserved_Tasks(),
+        satmon.get_Celery_Revoked_Tasks(),
+        satmon.get_Mongo_RSVP_Resource(),
+        satmon.get_Mongo_Tasks(),
+        satmon.get_Mongo_Workers(),
+    ]
+
     if os.geteuid() == 0:
-        parser = argparse.ArgumentParser()
-        parser.add_argument("-i",
-                            "--interval",
-                            help="Interval in which to collect the information",
-                            action="store_true")
-        parser.add_argument('-c',
-                            '--clean_up',
-                            help='tar up all collected files for export',
-                            action='store_true')
-
-        args = parser.parse_args()
-        satmon = Satellite_Monitor()
-
-        if args.interval:
-            while True:
-                satmon.get_PulpAdmin_Password()
-                satmon.get_Pulp_Status()
-                satmon.get_Pulp_Tasks()
-                satmon.get_Qpid_Connections()
-                satmon.get_Qpid_Exchanges()
-                satmon.get_Qpid_General()
-                satmon.get_Qpid_Memory()
-                satmon.get_Qpid_Queues()
-                satmon.get_Qpid_Subscriptions()
-                satmon.get_Celery_Active_Queues()
-                satmon.get_Celery_Active_Tasks()
-                satmon.get_Celery_Clock()
-                satmon.get_Celery_Conf()
-                satmon.get_Celery_Memory_Dump()
-                satmon.get_Celery_Memory_Sample()
-                satmon.get_Celery_Obj_Graph()
-                satmon.get_Celery_Ping()
-                satmon.get_Celery_Registered_Tasks()
-                satmon.get_Celery_Report()
-                satmon.get_Celery_Reserved_Tasks()
-                satmon.get_Celery_Revoked_Tasks()
-                satmon.get_Mongo_RSVP_Resource()
-                satmon.get_Mongo_Tasks()
-                satmon.get_Mongo_Workers()
-        elif args.clean_up:
-            satmon.clean_up()
-        else:
-            satmon.get_PulpAdmin_Password()
-            satmon.get_Pulp_Status()
-            satmon.get_Pulp_Tasks()
-            satmon.get_Qpid_Connections()
-            satmon.get_Qpid_Exchanges()
-            satmon.get_Qpid_General()
-            satmon.get_Qpid_Memory()
-            satmon.get_Qpid_Queues()
-            satmon.get_Qpid_Subscriptions()
-            satmon.get_Celery_Active_Queues()
-            satmon.get_Celery_Active_Tasks()
-            satmon.get_Celery_Clock()
-            satmon.get_Celery_Conf()
-            satmon.get_Celery_Memory_Dump()
-            satmon.get_Celery_Memory_Sample()
-            satmon.get_Celery_Obj_Graph()
-            satmon.get_Celery_Ping()
-            satmon.get_Celery_Registered_Tasks()
-            satmon.get_Celery_Report()
-            satmon.get_Celery_Reserved_Tasks()
-            satmon.get_Celery_Revoked_Tasks()
-            satmon.get_Mongo_RSVP_Resource()
-            satmon.get_Mongo_Tasks()
-            satmon.get_Mongo_Workers()
-            satmon.clean_up()
-    else:
         print("Please run as the root user.")
+        return
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i",
+                        "--interval",
+                        type = int,
+                        default = 100,
+                        help="Interval in which to collect the information")
+    parser.add_argument('-c',
+                        '--clean_up',
+                        help='tar up all collected files for export',
+                        action='store_true')
 
-main()
+    args = parser.parse_args()
+    print args
+
+    if args.interval:
+        while True:
+            for task in TASKS:
+                task()
+            time.sleep(args.interval)
+    elif args.clean_up:
+        satmon.clean_up()
+    else:
+        for task in TASKS:
+            task()
+            satmon.clean_up()
+
+if __name__ == '__main__':
+    main()
