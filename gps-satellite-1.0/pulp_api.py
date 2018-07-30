@@ -10,20 +10,28 @@ class Pulp_api():
         self.session = Session()
         selection = raw_input("Are you executing gps-satellite on the Satellite server?[Y/N]")
         if selection.upper() == 'Y':
-            command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
-            command2 = ['cut', '-d', ' ', '-f2']
-            command3 = ['grep', '^default_password', '/etc/pulp/server.conf']
-            self.line1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
-            self.line2 = subprocess.Popen(command3, stdout=subprocess.PIPE)
-            self.line3 = subprocess.Popen(command2, stdin=self.line1.stdout, stdout=subprocess.PIPE)
-            self.line4 = subprocess.Popen(command2, stdin=self.line2.stdout, stdout=subprocess.PIPE)
-            self.user = self.line3.stdout.read().strip()
-            self.pw = self.line4.stdout.read().strip()
+            with open('/etc/pulp/server.conf', 'r') as pulpconfigfile:
+                pulpconfiglines = pulpconfigfile.readlines()
+            passwordline = [ l.strip() for l in pulpconfiglines if l.startswith('default_password:') ]
+            passwordline = passwordline[0]
+            pulp_pw = passwordline.split()[1]
+            self.pulp_pw = pulp_pw
+            self.pulp_user = 'admin'
+            #command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
+            #command2 = ['cut', '-d', ' ', '-f2']
+            #command3 = ['grep', '^default_password', '/etc/pulp/server.conf']
+            #self.line1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
+            #self.line2 = subprocess.Popen(command3, stdout=subprocess.PIPE)
+            #self.line3 = subprocess.Popen(command2, stdin=self.line1.stdout, stdout=subprocess.PIPE)
+            #self.line4 = subprocess.Popen(command2, stdin=self.line2.stdout, stdout=subprocess.PIPE)
+            #self.user = self.line3.stdout.read().strip()
+            #self.pw = self.line4.stdout.read().strip()
+
         else:
-            self.user = raw_input("Enter the pulp username (Found on the Satellite /etc/pulp/server.conf: ")
-            self.pw = raw_input("Enter the pulp password (Found on the Satellite /etc/pulp/server.conf: ")
+            self.pulp_user = raw_input("Enter the pulp username (Found on the Satellite /etc/pulp/server.conf: ")
+            self.pulp_pw = raw_input("Enter the pulp password (Found on the Satellite /etc/pulp/server.conf: ")
         self.hostname = hostname
-        self.session.auth = (self.user, self.pw)
+        self.session.auth = (self.pulp_user, self.pulp_pw)
         self.session.verify = False
         self.path = path
 
