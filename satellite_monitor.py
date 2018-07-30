@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+import sys
 import yum
 import datetime
 import subprocess
@@ -11,6 +13,7 @@ from distutils.dir_util import copy_tree
 import argparse
 import time
 import pdb
+
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -309,24 +312,49 @@ class Satellite_Monitor():
         if os.path.exists(DIR + 'gps/'):
             shutil.rmtree('/tmp/gps/')
 
+    def countdown(self,interval):
+        print('Collection complete')
+        # Find len of interval
+        digitlen=len(str(interval))
+        # Print countdown warning
+        countdownstr='  Waiting {:>'+str(digitlen)+'} seconds to start again\r'
+        # This ^ will look like ' Waiting {:>3} seconds 
+        # to start again\r'
+        # Loop through countdown interval
+        for i in xrange(interval, 0, -1):
+            print(countdownstr.format(i), end='')
+            sys.stdout.flush()
+            time.sleep(1)
+        print('')
+        print('------------')
+        print('RESTARTING')
+        print('------------')
+
 def main():
-    pdb.set_trace()
+    #pdb.set_trace()
     if os.geteuid() == 0:
         parser = argparse.ArgumentParser()
-        parser.add_argument("-i",
-                            "--interval",
-                            type = int,
+        parser.add_argument('-i',
+                            '--interval',
+                            type=int,
                             default=600,
-                            help="Interval in seconds to collect the information",)
+                            help='Interval in seconds to collect the information')
+
         parser.add_argument('-c',
                             '--clean_up',
                             help='tar up all collected files for export',
                             action='store_true')
+
+        parser.add_argument('-r',
+                            '--repeat',
+                            help='repeat again',
+                            action='store_true',
+                            default=False)
         args = parser.parse_args()
 
         satmon = Satellite_Monitor()
 
-        if args.interval:
+        if args.repeat:
             while True:
                 satmon.get_PulpAdmin_Password()
                 satmon.get_Pulp_Status()
@@ -352,9 +380,11 @@ def main():
                 satmon.get_Mongo_RSVP_Resource()
                 satmon.get_Mongo_Tasks()
                 satmon.get_Mongo_Workers()
-                time.sleep(args.interval)
+                satmon.countdown(args.interval)
+
         elif args.clean_up:
             satmon.clean_up()
+            
         else:
             satmon.get_PulpAdmin_Password()
             satmon.get_Pulp_Status()
