@@ -329,6 +329,31 @@ class Satellite_Monitor():
         ps_auxwwwm = output.stdout.read()
         self.write_to_file('ps_auxwwwm', ps_auxwwwm)
 
+    def get_Netstat_TPL(self):
+        """Gather netstat -tpl Output"""
+        print('Gather netstat -tpl Output')
+        command = ['netstat', '-tpl']
+        output = subprocess.Popen(command, stdout=subprocess.PIPE)
+        netstattpl = output.stdout.read()
+        self.write_to_file('netstat-tpl', netstattpl)
+
+    def get_Nestat_TP(self):
+        """Gather netstat -tp Output"""
+        print('Gather netstat -tp Output')
+        command = ['netstat', '-tp']
+        output = subprocess.Popen(command, stdout=subprocess.PIPE)
+        netstattp = output.stdout.read()
+        self.write_to_file('netstat-tp', netstattp)
+
+    def get_Netstat_AUPL(self):
+        """Gather netstat -aupl Output"""
+        print('Gather netstat -aupl Output')
+        command = ['netstat', '-aupl']
+        output = subprocess.Popen(command, stdout=subprocess.PIPE)
+        netstataupl = output.stdout.read()
+        self.write_to_file('netstat-aupl', netstataupl)
+
+
     def get_SAR_data(self):
         if not os.path.exists(SAR):
             os.makedirs(FULL_PATH + 'sa/')
@@ -398,7 +423,10 @@ class Satellite_Monitor():
             get_Passenger_Status,
             get_Process_Output1,
             get_Process_Output2,
-            get_Process_Output3]
+            get_Process_Output3,
+            get_Netstat_AUPL,
+            get_Netstat_TPL,
+            get_Nestat_TP]
 
 def main():
     #pdb.set_trace()
