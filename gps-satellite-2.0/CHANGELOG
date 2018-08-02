@@ -1,0 +1,53 @@
+[done]v1.0.1
+- Create functions for all independent api calls
+
+[done]v1.0.2
+- Create 1 search function for all functions to use
+
+[done]v1.0.3
+- Suppress warning messages on stdout
+
+[done]v1.0.4
+- Add print messages for each function to alert user of what api call is currently being run
+
+[done]v1.0.5
+- Output file needs to be in json format and readable by jq/jgrep/python -m json.tool
+
+[done]v1.0.6
+- Add feature to tar up all files
+
+[done]v1.0.7
+- Add feature to request username, password, FQDN
+
+[done]v1.0.8
+- Add organization and lce loops for inbedded api calls
+
+[done]v1.0.9
+- Add additional api calls using org and lce loops
+
+[done]v1.0.10
+- Add Capsule loop to gather additional capsule information
+
+[done]v1.0.11
+- Add Content view loop to gather additional content view information
+
+[done]v1.0.12
+- Add host loop for additional host information
+
+[done]v1.0.13
+- Add feature to attempt to upload tar with "redhat-support-tool" and remove tar. Otherwise keep tar file.
+
+[done]v1.0.14
+- Add Pulp api calls
+
+[done]v1.0.15
+- Grab Satellite hostname from the local system, offer as "Enter" default when prompted for the FQDN
+
+[done]v1.0.15
+- Graceful fail of RHST upload and reminder that file is in /tmp 
+
+[done]v1.0.16
+- /api/hosts/<HOST ID> for all hosts with switch
+
+[done]v2.0.1
+- Added Satellite Monitor feature
