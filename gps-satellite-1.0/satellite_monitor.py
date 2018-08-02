@@ -29,6 +29,21 @@ class Satellite_Monitor():
             os.makedirs(FULL_PATH)
             os.chdir(FULL_PATH)
 
+    def verify_sysstat_install(self):
+        yumbase=yum.YumBase()
+        if yumbase.rpmdb.searchNevra(name='sysstat'):
+            print('Sysstat installed, continuing...')
+        else:
+            installsysstat = raw_input('Sysstat not installed, would you like to install it?')
+            if installsysstat.upper == 'Y':
+                print("installing sysstat...")
+                installer = subprocess.Popen("yum install sysstat -y", shell=True)
+                installer.wait()
+            elif installsysstat == 'N':
+                print('not installing sysstat')
+            else:
+                print('Invalid option')
+                exit
     
     def verify_pulpadmin_install(self):
         """Check if pulp-admin has been installed"""

@@ -17,15 +17,6 @@ class Pulp_api():
             pulp_pw = passwordline.split()[1]
             self.pulp_pw = pulp_pw
             self.pulp_user = 'admin'
-            #command1 = ['grep', '^default_login', '/etc/pulp/server.conf']
-            #command2 = ['cut', '-d', ' ', '-f2']
-            #command3 = ['grep', '^default_password', '/etc/pulp/server.conf']
-            #self.line1 = subprocess.Popen(command1, stdout=subprocess.PIPE)
-            #self.line2 = subprocess.Popen(command3, stdout=subprocess.PIPE)
-            #self.line3 = subprocess.Popen(command2, stdin=self.line1.stdout, stdout=subprocess.PIPE)
-            #self.line4 = subprocess.Popen(command2, stdin=self.line2.stdout, stdout=subprocess.PIPE)
-            #self.user = self.line3.stdout.read().strip()
-            #self.pw = self.line4.stdout.read().strip()
 
         else:
             self.pulp_user = raw_input("Enter the pulp username (Found on the Satellite /etc/pulp/server.conf: ")
