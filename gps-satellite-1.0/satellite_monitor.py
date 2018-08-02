@@ -428,11 +428,14 @@ class Satellite_Monitor():
             get_Netstat_TPL,
             get_Nestat_TP]
 
-def main():
+def main(raw_args=None):
     #pdb.set_trace()
     satmon = Satellite_Monitor()
 
-    if os.geteuid() == 0:
+    if os.geteuid() != 0:
+        print("Please run as the root user.")
+        exit
+    else:
         parser = argparse.ArgumentParser()
         parser.add_argument('-i',
                             '--interval',
@@ -450,9 +453,10 @@ def main():
                             help='',
                             action='store_true',
                             default=False)
-        args = parser.parse_args()
+        args = parser.parse_args(raw_args)
 
         if args.repeat:
+            satmon.verify_pulpadmin_install()
             while True:
                 for i in satmon.TASKS:
                     i(satmon)
@@ -460,11 +464,10 @@ def main():
         elif args.clean_up:
             satmon.clean_up()
         else:
+            satmon.verify_pulpadmin_install()
             for i in satmon.TASKS:
                 i(satmon)
             satmon.clean_up()
-    else:
-        print("Please run as the root user.")
 
 if __name__ == '__main__':
     main()
