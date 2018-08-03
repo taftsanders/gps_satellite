@@ -1,6 +1,6 @@
 Name: gps-satellite
 Version: 2.0	
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Satellite 6 multi-functional troubleshooting tool	
 Group: Applications/File	
 License: GPLv3	
@@ -37,6 +37,9 @@ chmod +x ${RPM_BUILD_ROOT}/usr/bin/gps_satellite
 %doc CHANGELOG LICENSE
 
 %changelog
+* Fri Aug 03 2018 Taft Sanders <tasander@redhat.com> - 2.0.2
+- Resolved qpid cert path error not found
+
 * Wed Aug 01 2018 Taft Sanders <tasander@redhat.com> - 2.0.1
 - Added Satellite performance monitoring feature
 
