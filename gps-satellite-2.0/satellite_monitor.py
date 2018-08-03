@@ -12,8 +12,7 @@ import tarfile
 from distutils.dir_util import copy_tree
 import argparse
 import time
-import pdb
-
+import distutils
 
 
 DATE = str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
@@ -29,6 +28,21 @@ class Satellite_Monitor():
             os.makedirs(FULL_PATH)
             os.chdir(FULL_PATH)
 
+    def verify_sysstat_install(self):
+        yumbase=yum.YumBase()
+        if yumbase.rpmdb.searchNevra(name='sysstat'):
+            print('Sysstat installed, continuing...')
+        else:
+            installsysstat = raw_input('Sysstat not installed, would you like to install it? ')
+            if installsysstat.upper() == 'Y':
+                print("Installing sysstat...")
+                installer = subprocess.Popen("yum install sysstat -y", shell=True)
+                installer.wait()
+            elif installsysstat.upper() == 'N':
+                print('Not installing sysstat')
+            else:
+                print('Invalid option')
+                exit
     
     def verify_pulpadmin_install(self):
         """Check if pulp-admin has been installed"""
@@ -365,7 +379,6 @@ class Satellite_Monitor():
 
     def clean_up(self):
         """Archive all collected data"""
-        self.get_SAR_data()
         os.chdir('/tmp')
         with tarfile.open(FILE_NAME, "w:gz") as tar:
             tar.add('/tmp/gps/', arcname='.')
@@ -451,18 +464,35 @@ def main(raw_args=None):
         args = parser.parse_args(raw_args)
 
         if args.repeat:
+            satmon.verify_sysstat_install()
             satmon.verify_pulpadmin_install()
-            while True:
-                for i in satmon.TASKS:
-                    i(satmon)
-                satmon.countdown(args.interval)
+            try:
+                while True:
+                    for i in satmon.TASKS:
+                        i(satmon)
+                    satmon.countdown(args.interval)
+            except KeyboardInterrupt:
+                print('\nPlease run Monitor Cleanup to compress your data for export.')
+                exit
         elif args.clean_up:
+            try:
+                satmon.get_SAR_data()
+            except distutils.errors.DistutilsFileError:
+                print('No SAR data to collect, skipping...')
             satmon.clean_up()
+            print('Your data collection can be found at /tmp/' + FILE_NAME)
+
         else:
+            satmon.verify_sysstat_install()
             satmon.verify_pulpadmin_install()
             for i in satmon.TASKS:
                 i(satmon)
+            try:
+                satmon.get_SAR_data()
+            except distutils.errors.DistutilsFileError:
+                print('No SAR data to collect, skipping...')
             satmon.clean_up()
+            print('Your data collection can be found at /tmp/' + FILE_NAME)
 
 if __name__ == '__main__':
     main()

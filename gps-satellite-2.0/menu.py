@@ -7,7 +7,8 @@ class Menu(object):
     print('Welcome to GPS Satellite. What would you like to do today?')
     option=raw_input('1. Gather Satellite Facts\n' +
                      '2. Monitor Satellite Performance\n' +
-                     '3. Exit\n')
+                     '3. Monitor Clean up\n' +
+                     '4. Exit\n')
     if option == '1':
         gps.main()
     elif option == '2':
@@ -23,6 +24,9 @@ class Menu(object):
             print('Not a valid option!')
             exit
     elif option == '3':
+        print('Cleaning up...')
+        monitor.main(['-c'])
+    elif option == '4':
         exit
     else:
         print('Option not valid, goodbye')
