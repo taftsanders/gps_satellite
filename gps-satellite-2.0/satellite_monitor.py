@@ -205,8 +205,7 @@ class Satellite_Monitor():
     def get_Qpid_General(self):
         """Gather Qpid General"""
         print('Gather Qpid General')
-        command = ['qpid-stat', '-g', '--ssl-certificate=\
-                    /etc/pki/katello/qpid_client_striped.crt', 
+        command = ['qpid-stat', '-g', '--ssl-certificate=/etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidgen = output.stdout.read()
@@ -215,8 +214,7 @@ class Satellite_Monitor():
     def get_Qpid_Connections(self):
         """Gather Qpid Connections"""
         print('Gather Qpid Connections')
-        command = ['qpid-stat', '-c', '--ssl-certificate=\
-                    /etc/pki/katello/qpid_client_striped.crt', 
+        command = ['qpid-stat', '-c', '--ssl-certificate=/etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidconn = output.stdout.read()
@@ -225,8 +223,7 @@ class Satellite_Monitor():
     def get_Qpid_Exchanges(self):
         """Gather Qpid Exchanges"""
         print('Gather Qpid Exchanges')
-        command = ['qpid-stat', '-e', '--ssl-certificate=\
-                    /etc/pki/katello/qpid_client_striped.crt', 
+        command = ['qpid-stat', '-e', '--ssl-certificate=/etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidexch = output.stdout.read()
@@ -235,8 +232,7 @@ class Satellite_Monitor():
     def get_Qpid_Queues(self):
         """Gather Qpid Queues"""
         print('Gather Qpid Queues')
-        command = ['qpid-stat', '-q', '--ssl-certificate=\
-                    /etc/pki/katello/qpid_client_striped.crt', 
+        command = ['qpid-stat', '-q', '--ssl-certificate=/etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidque = output.stdout.read()
@@ -245,8 +241,7 @@ class Satellite_Monitor():
     def get_Qpid_Subscriptions(self):
         """Gather Qpid Subscriptions"""
         print('Gather Qpid Subscriptions')
-        command = ['qpid-stat', '-u', '--ssl-certificate=\
-                    /etc/pki/katello/qpid_client_striped.crt', 
+        command = ['qpid-stat', '-u', '--ssl-certificate=/etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidsub = output.stdout.read()
@@ -255,8 +250,8 @@ class Satellite_Monitor():
     def get_Qpid_Memory(self):
         """Gather Qpid Memory"""
         print('Gather Qpid Memory')
-        command = ['qpid-stat', '-m', '--ssl-certificate=\
-                    /etc/pki/katello/qpid_client_striped.crt', 
+        command = ['qpid-stat', '-m', '--ssl-certificate=' +
+                   '/etc/pki/katello/qpid_client_striped.crt', 
                     '-b', 'amqps://localhost:5671']
         output = subprocess.Popen(command, stdout=subprocess.PIPE)
         qpidmem = output.stdout.read()
