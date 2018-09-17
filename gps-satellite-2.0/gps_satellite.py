@@ -955,7 +955,6 @@ def main():
             sat_api.contentview_versions()
             sat_api.docker_manifests()
             sat_api.docker_tags()
-            sat_api.fact_values()
             #############################
             #####DEPENDENT CALLS#########
             #############################
