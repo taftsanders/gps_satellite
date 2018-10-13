@@ -234,86 +234,16 @@ class ApiCall(object):
                 option = raw_input("Please enter a valid selection: 'Y' for yes or 'N' for no: ")
                 option.upper()
 
-    # Gather all Satellite organizations
-    def organization_list(self):
-        print("Gathering all Satellite Organizations")
-        self.search("/katello/api/organizations", "organization_list")
-
-    # Gather all Satellite locations
-    def location_list(self):
-        print("Gathering all Satellite Locations")
-        self.search("/api/locations", "location_list")
-
-    # Gather all Capsules
-    def capsule_list(self):
-        print("Gathering all Capsule servers")
-        self.search("/katello/api/capsules", "capsule_list")
-
-    #Gather all Smart Proxies information
-    def smart_proxies_list(self):
-        print("Gathering all Smart Proxies")
-        self.search("/api/smart_proxies", "smart_proxies")
-
-    # Gather all reported information from the dashboard
-    def dashboard_details(self):
-        print("Gathering all Satellite Dashboard information")
-        self.search("/api/dashboard", "dashboard")
-
-    # Gather all domains from the Satellite
-    def domain_list(self):
-        print("Gathering all Domains on the Satellite")
-        self.search("/api/domains", "domain_list")
-
-    # Gather all errata synced from the Satellite
-    def errata_list(self):
-        print("Gathering all Errata synced on the Satellite")
-        print("**This may take a while**")
-        self.search("/katello/api/errata", "errata_list")
-
-    # Gather all openscap policies on the Satellite
-    def openscap_policy_list(self):
-        print("Gathering all Openscap policies from the Satellite")
-        self.search("/api/v2/compliance/policies", "openscap_policies_list")
-
-    # Gather a summary/count of all tasks on the Satellite by label
-    def satellite_tasks_summary(self):
-        print("Gathering Task summary by label")
-        self.search("/foreman_tasks/api/tasks/summary", "satellite_tasks_summary")
-
-    # Gather the output of hammer ping
-    def hammer_ping(self):
-        print("Gathering results of \"hammer ping\"")
-        self.search("/katello/api/ping", "hammer_ping")
-
-    # Gather all realms from the Satellite
-    def realms_list(self):
-        print("Gathering all Realms from the Satellite")
-        self.search("/api/realms", "realms_list")
-
-    # Gather all user roles from the Satellite
-    def user_roles_list(self):
-        print("Gathering all Roles from the Satellite")
-        self.search("/api/roles", "user_roles")
-
-    # Gather all the settings from the Satellite
-    def settings_list(self):
-        print("Gathering all Settings from the Satellite")
-        self.search("/api/settings", "settings")
-
-    # Gather all subnets from the Satellite
-    def subnets_list(self):
-        print("Gathering all Subnets from the Satellite")
-        self.search("/api/subnets", "subnet_list")
-
-    # Gather all users from the Satellite
-    def user_list(self):
-        print("Gathering all Users from the Satellite")
-        self.search("/api/users", "user_list")
 
     # Gather all architectures from Satellite
     def arch_list(self):
         print("Gathering all architectures from the Satellite")
         self.search("/api/architectures", "arch_list")
+
+    # Gather all openscap arf reports
+    def arf_reports(self):
+        print("Gathering all openscap arf reports from the Satellite")
+        self.search("/api/v2/compliance/arf_reports", "openscap_arf_reports")
 
     # Gather all audits from Satellite
     def audit_list(self):
@@ -329,6 +259,11 @@ class ApiCall(object):
     def bookmark_list(self):
         print("Gathering all bookmarks from the Satellite")
         self.search("/api/bookmarks", "bookmark_list")
+
+   # Gather all Capsules
+    def capsule_list(self):
+        print("Gathering all Capsule servers")
+        self.search("/katello/api/capsules", "capsule_list")
 
     # Gather all global (common) parameters
     def common_parameters_list(self):
@@ -365,6 +300,16 @@ class ApiCall(object):
         print("Gathering all docker containers from the Satellite")
         self.search("/docker/api/v2/containers", "docker_containers")
 
+    # Gather content view filters
+    def contentview_filters(self):
+        print("Gathering content view filters")
+        self.search("/katello/api/content_view_filters", "contentviewfilters")
+
+    # Gather content view versions
+    def contentview_versions(self):
+        print("Gathering all content view versions")
+        self.search("/katello/api/content_view_versions", "contentviewversions")
+
     # Gather all discovered hosts
     def discovered_hosts(self):
         print("Gathering all discovered hosts from the Satellite")
@@ -375,30 +320,71 @@ class ApiCall(object):
         print("Gathering all discovery rules from the Satellite")
         self.search("/api/v2/discovery_rules", "discovery_rules")
 
-    # Gather all user role filters
-    def user_role_filters(self):
-        print("Gathering all user role filters from the Satellite")
-        self.search("/api/filters", "user_role_filters")
+   # Gather all reported information from the dashboard
+    def dashboard_details(self):
+        print("Gathering all Satellite Dashboard information")
+        self.search("/api/dashboard", "dashboard")
 
-    # Gather all openscap arf reports
-    def arf_reports(self):
-        print("Gathering all openscap arf reports from the Satellite")
-        self.search("/api/v2/compliance/arf_reports", "openscap_arf_reports")
+    # Gather all Docker manifests
+    def docker_manifests(self):
+        print("Gathering all docker manifests")
+        self.search("/katello/api/docker_manifests", "dockermanifests")
 
-    # Gather all openscap contents
-    def openscap_contents(self):
-        print("Gathering all openscap contents from the Satellite")
-        self.search("/api/v2/compliance/scap_contents", "openscap_contents")
+    # Gather all docker registries
+    def docker_registries(self):
+        print("Gathering all docker registries")
+        self.search("/docker/api/v2/registries", "docker_registries")
+
+    # Gather all Docker tags
+    def docker_tags(self):
+        print("Gathering all docker tags")
+        self.search("/katello/api/docker_tags", "dockertags")
+
+    # Gather all domains from the Satellite
+    def domain_list(self):
+        print("Gathering all Domains on the Satellite")
+        self.search("/api/domains", "domain_list")
+
+    # Gather all errata synced from the Satellite
+    def errata_list(self):
+        print("Gathering all Errata synced on the Satellite")
+        print("**This may take a while**")
+        self.search("/katello/api/errata", "errata_list")
+
+    # Gather all sub-man fact values
+    def fact_values(self):
+        print("Gathering all fact values")
+        self.search("/api/fact_values", "sub-man_fact_values")
 
     # Gather all GPG keys
     def gpgkey_list(self):
         print("Gathering all GPG keys from the Satellite")
         self.search("/katello/api/gpg_keys", "gpgkey_list")
 
-    # Gather all REX job history
-    def rex_history_list(self):
-        print("Gathering all REX history")
-        self.search("/api/job_invocations", "rex_history")
+    # Gather the output of hammer ping
+    def hammer_ping(self):
+        print("Gathering results of \"hammer ping\"")
+        self.search("/katello/api/ping", "hammer_ping")
+
+    # Gather all Satellite locations
+    def location_list(self):
+        print("Gathering all Satellite Locations")
+        self.search("/api/locations", "location_list")
+ 
+    # Gather all openscap contents
+    def openscap_contents(self):
+        print("Gathering all openscap contents from the Satellite")
+        self.search("/api/v2/compliance/scap_contents", "openscap_contents")
+
+    # Gather all openscap policies on the Satellite
+    def openscap_policy_list(self):
+        print("Gathering all Openscap policies from the Satellite")
+        self.search("/api/v2/compliance/policies", "openscap_policies_list")
+
+    # Gather all Satellite organizations
+    def organization_list(self):
+        print("Gathering all Satellite Organizations")
+        self.search("/katello/api/organizations", "organization_list")
 
     # Gather all Operating systems
     def os_list(self):
@@ -415,40 +401,60 @@ class ApiCall(object):
         print("Gathering all permissions")
         self.search("/api/permissions", "permissions_list")
 
+    # Gather all realms from the Satellite
+    def realms_list(self):
+        print("Gathering all Realms from the Satellite")
+        self.search("/api/realms", "realms_list")
+
     # Gather all recurring logics
     def recurring_logics(self):
         print("Gathering all recurring logics")
         self.search("/foreman_tasks/api/recurring_logics", "recurring_logics")
-
-    # Gather all docker registries
-    def docker_registries(self):
-        print("Gathering all docker registries")
-        self.search("/docker/api/v2/registries", "docker_registries")
-
-    # Gather all REX features
-    def rex_features_list(self):
-        print("Gathering all REX features")
-        self.search("/api/remote_execution_features", "rex_features")
 
     # Gather all reports for Capsules?
     def reports_list(self):
         print("Gathering all reports")
         self.search("/api/reports", "reports")
 
-    # Gather all smart proxies
-    def smart_proxy_list(self):
-        print("Gathering all smart proxies")
-        self.search("/api/smart_variables", "smart_proxies_list")
+    # Gather all REX features
+    def rex_features_list(self):
+        print("Gathering all REX features")
+        self.search("/api/remote_execution_features", "rex_features")
+
+    # Gather all REX job history
+    def rex_history_list(self):
+        print("Gathering all REX history")
+        self.search("/api/job_invocations", "rex_history")
+
+    # Gather a summary/count of all tasks on the Satellite by label
+    def satellite_tasks_summary(self):
+        print("Gathering Task summary by label")
+        self.search("/foreman_tasks/api/tasks/summary", "satellite_tasks_summary")
+
+    #Gather all Smart Proxies information
+    def smart_proxies_list(self):
+        print("Gathering all Smart Proxies")
+        self.search("/api/smart_proxies", "smart_proxies")
 
     # Gather all smart variables
     def smart_variables_list(self):
         print("Gathering all smart variables")
         self.search("/api/smart_variables", "smart_variables_list")
 
+    # Gather all the settings from the Satellite
+    def settings_list(self):
+        print("Gathering all Settings from the Satellite")
+        self.search("/api/settings", "settings")
+
     # Gather Statistics
     def statistics(self):
         print("Gathering statistics")
         self.search("/api/statistics", "statistics")
+
+    # Gather all subnets from the Satellite
+    def subnets_list(self):
+        print("Gathering all Subnets from the Satellite")
+        self.search("/api/subnets", "subnet_list")
 
     # Gather Template kinds
     def template_kind_list(self):
@@ -460,41 +466,24 @@ class ApiCall(object):
         print("Gathering usergroup list")
         self.search("/api/usergroups", "usergroups")
 
-    # Gather content view filters
-    def contentview_filters(self):
-        print("Gathering content view filters")
-        self.search("/katello/api/content_view_filters", "contentviewfilters")
+    # Gather all users from the Satellite
+    def user_list(self):
+        print("Gathering all Users from the Satellite")
+        self.search("/api/users", "user_list")
 
-    # Gather content view versions
-    def contentview_versions(self):
-        print("Gathering all content view versions")
-        self.search("/katello/api/content_view_versions", "contentviewversions")
+    # Gather all user role filters
+    def user_role_filters(self):
+        print("Gathering all user role filters from the Satellite")
+        self.search("/api/filters", "user_role_filters")
 
-    # Gather all Docker manifests
-    def docker_manifests(self):
-        print("Gathering all docker manifests")
-        self.search("/katello/api/docker_manifests", "dockermanifests")
-
-    # Gather all Docker tags
-    def docker_tags(self):
-        print("Gathering all docker tags")
-        self.search("/katello/api/docker_tags", "dockertags")
-
-    # Gather all sub-man fact values
-    def fact_values(self):
-        print("Gathering all fact values")
-        self.search("/api/fact_values", "sub-man_fact_values")
+    # Gather all user roles from the Satellite
+    def user_roles_list(self):
+        print("Gathering all Roles from the Satellite")
+        self.search("/api/roles", "user_roles")
 
     ###########################################################################
     ###################START OF DEPENDANT API CALLS############################
     ###########################################################################
-
-    # Gather details of Satellite Organizations
-    def organization_details(self):
-        for org in self.org_id_list:
-            print("Gathering Organization details for Org: " + str(org))
-            self.search("/katello/api/organizations/" + str(org), "organizational_details_org"
-                        + str(org))
 
     # Gather all activation keys
     def activation_key_list(self):
@@ -509,121 +498,6 @@ class ApiCall(object):
             print("Gathering ldap auth sources for Org id: " + str(i))
             self.search("/api/organizations/" + str(i) + "/auth_source_ldaps",
                         "auth_source_ldaps_org" + str(i))
-
-    # Gather all content views
-    def content_views_list(self):
-        for i in self.org_id_list:
-            print("Gathering content views for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/content_views",
-                        "content_views_org" + str(i))
-
-    # Gather all puppet environments
-    def puppet_environments_list(self):
-        for i in self.org_id_list:
-            print("Gathering puppet environments for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/environments",
-                        "puppet_environments_org" + str(i))
-
-    # Gather all host collections
-    def host_collection_list(self):
-        for i in self.org_id_list:
-            print("Gathering host collections for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/host_collections",
-                        "host_collections_org" + str(i))
-
-    # Gather all hostgroups
-    def hostgroups_list(self):
-        for i in self.org_id_list:
-            print("Gathering all hostgroups for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/hostgroups", "hostgroups_org" + str(i))
-
-    # Gather all hosts
-    def hosts_lists(self):
-        for i in self.org_id_list:
-            print("Gathering all hosts for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/hosts", "hosts_org" + str(i))
-
-    # Gather individual host details
-    def host_details(self):
-        for i in self.org_id_list:
-            self.org_host_list = []
-            org_host = self.session.get(self.hostname + '/api/organizations/' + str(i) +
-                                        '/hosts').json()
-            print("Collecting information on each host in Org id: " + str(i))
-            for result in org_host['results']:
-                self.org_host_list.append(result['id'])
-            for j in self.org_host_list:
-                print("Collecting information on host id: " + str(j))
-                self.search("/api/hosts/" + str(j), "host" + str(j) + "_org" + str(i))
-
-    # Gather all REX templates
-    def rex_templates_list(self):
-        for i in self.org_id_list:
-            print("Gathering all REX templates for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/job_templates", "rex_templates_org"
-                        + str(i))
-
-    # Gather all Lifecycle Environments (LCE)
-    def lce_list(self):
-        for i in self.org_id_list:
-            print("Gathering all Lifecycle Environments for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/environments", "lce_org"
-                        + str(i))
-
-    # Gather all Media
-    def media_list(self):
-        for i in self.org_id_list:
-            print("Gathering all Media for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/media", "media_org" + str(i))
-
-    # Gather all Products
-    def products_list(self):
-        for i in self.org_id_list:
-            print("Gathering all Products for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/products", "products_org"
-                        + str(i))
-
-    # Gather all provisioning templates
-    def provisioning_templates_list(self):
-        for i in self.org_id_list:
-            print("Gathering all Provisioning templates for Org id: " + str(i))
-            self.search("/api/organizations/" + str(i) + "/provisioning_templates",
-                        "provisioning_templates_org" + str(i))
-
-    # Gather all partition tables
-    def partition_tables_list(self):
-        for i in self.org_id_list:
-            print("Gathering all Partition tables for Org id: " + str(i))
-            self.search("/api/organizations/:organization_id/ptables" + str(i) + "/ptables",
-                        "partition_tables_org" + str(i))
-
-    # Gather all subscriptions
-    def subscription_list(self):
-        for i in self.org_id_list:
-            print("Gathering all Subscriptions for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/subscriptions",
-                        "subscriptions_org" + str(i))
-
-    # Gather manifest history
-    def manifest_history(self):
-        for i in self.org_id_list:
-            print("Gathering Manifest history for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/subscriptions/manifest_history",
-                        "manifest_history_org" + str(i))
-
-    # Gather sync plans
-    def sync_plan_list(self):
-        for i in self.org_id_list:
-            print("Gathering Sync plan for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/sync_plans",
-                        "sync_plan_org" + str(i))
-
-    # Gather Uebercerts
-    def uebercert_list(self):
-        for i in self.org_id_list:
-            print("Gathering Ubercert for Org id: " + str(i))
-            self.search("/katello/api/organizations/" + str(i) + "/uebercert",
-                        "uebercert_org" + str(i))
 
     # Gather Capsule assigned lifecycle environments
     def capsule_lce_assigned_list(self):
@@ -658,7 +532,14 @@ class ApiCall(object):
                 self.search("/katello/api/capsules/" + str(i) + "/content/sync",
                             "capsule_lce_assigned_cap" + str(i))
 
-    # Gather Capsule sync status
+    # Gather all content views
+    def content_views_list(self):
+        for i in self.org_id_list:
+            print("Gathering content views for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/content_views",
+                        "content_views_org" + str(i))
+
+    # Gather Compute Resouse available image list
     def cr_avail_img_list(self):
         for i in self.compute_res_id_list:
             print("Gathering available images for Compute resource id: " + str(i))
@@ -685,6 +566,38 @@ class ApiCall(object):
             self.search("/katello/api/content_views/" + str(i) + "/content_view_puppet_modules",
                         "cv_puppet_modules_cv" + str(i))
 
+    # Gather all host collections
+    def host_collection_list(self):
+        for i in self.org_id_list:
+            print("Gathering host collections for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/host_collections",
+                        "host_collections_org" + str(i))
+
+    # Gather individual host details
+    def host_details(self):
+        for i in self.org_id_list:
+            self.org_host_list = []
+            org_host = self.session.get(self.hostname + '/api/organizations/' + str(i) +
+                                        '/hosts').json()
+            print("Collecting information on each host in Org id: " + str(i))
+            for result in org_host['results']:
+                self.org_host_list.append(result['id'])
+            for j in self.org_host_list:
+                print("Collecting information on host id: " + str(j))
+                self.search("/api/hosts/" + str(j), "host" + str(j) + "_org" + str(i))
+
+    # Gather all hostgroups
+    def hostgroups_list(self):
+        for i in self.org_id_list:
+            print("Gathering all hostgroups for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/hostgroups", "hostgroups_org" + str(i))
+
+    # Gather all hosts
+    def hosts_lists(self):
+        for i in self.org_id_list:
+            print("Gathering all hosts for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/hosts", "hosts_org" + str(i))
+
     # Gather all subscriptions assigned to each host
     def host_sub_list(self):
         for i in self.hosts_id:
@@ -692,12 +605,95 @@ class ApiCall(object):
             self.search("/api/hosts/" + str(i) + "/subscriptions",
                         "host_subscriptions_host" + str(i))
 
+    # Gather all Lifecycle Environments (LCE)
+    def lce_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Lifecycle Environments for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/environments", "lce_org"
+                        + str(i))
+
+    # Gather manifest history
+    def manifest_history(self):
+        for i in self.org_id_list:
+            print("Gathering Manifest history for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/subscriptions/manifest_history",
+                        "manifest_history_org" + str(i))
+
+    # Gather all Media
+    def media_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Media for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/media", "media_org" + str(i))
+
+    # Gather details of Satellite Organizations
+    def organization_details(self):
+        for org in self.org_id_list:
+            print("Gathering Organization details for Org: " + str(org))
+            self.search("/katello/api/organizations/" + str(org), "organizational_details_org"
+                        + str(org))
+
     # Gather all override values for smart variables
     def override_values_list(self):
         for i in self.smart_variable_id:
             print("Gathering override values for smart variable id: " + str(i))
             self.search("/api/smart_variables/" + str(i) + "/override_values",
                         "override_values_sv" + str(i))
+
+    # Gather all partition tables
+    def partition_tables_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Partition tables for Org id: " + str(i))
+            self.search("/api/organizations/:organization_id/ptables" + str(i) + "/ptables",
+                        "partition_tables_org" + str(i))
+
+    # Gather all Products
+    def products_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Products for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/products", "products_org"
+                        + str(i))
+
+    # Gather all provisioning templates
+    def provisioning_templates_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Provisioning templates for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/provisioning_templates",
+                        "provisioning_templates_org" + str(i))
+
+    # Gather all puppet environments
+    def puppet_environments_list(self):
+        for i in self.org_id_list:
+            print("Gathering puppet environments for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/environments",
+                        "puppet_environments_org" + str(i))
+
+    # Gather all REX templates
+    def rex_templates_list(self):
+        for i in self.org_id_list:
+            print("Gathering all REX templates for Org id: " + str(i))
+            self.search("/api/organizations/" + str(i) + "/job_templates", "rex_templates_org"
+                        + str(i))
+
+    # Gather all subscriptions
+    def subscription_list(self):
+        for i in self.org_id_list:
+            print("Gathering all Subscriptions for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/subscriptions",
+                        "subscriptions_org" + str(i))
+
+    # Gather sync plans
+    def sync_plan_list(self):
+        for i in self.org_id_list:
+            print("Gathering Sync plan for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/sync_plans",
+                        "sync_plan_org" + str(i))
+
+    # Gather Uebercerts
+    def uebercert_list(self):
+        for i in self.org_id_list:
+            print("Gathering Ubercert for Org id: " + str(i))
+            self.search("/katello/api/organizations/" + str(i) + "/uebercert",
+                        "uebercert_org" + str(i))
 
 def main():
     if os.geteuid() == 0:
@@ -747,7 +743,6 @@ def main():
             #####INDEPENDENT CALLS#####
             ###########################
             sat_api.organization_list()
-            sat_api.organization_details()
             sat_api.location_list()
             sat_api.capsule_list()
             sat_api.dashboard_details()
@@ -786,7 +781,7 @@ def main():
             sat_api.docker_registries()
             sat_api.rex_features_list()
             sat_api.reports_list()
-            sat_api.smart_proxy_list()
+            sat_api.smart_proxies_list()
             sat_api.smart_variables_list()
             sat_api.statistics()
             sat_api.template_kind_list()
@@ -796,10 +791,10 @@ def main():
             sat_api.docker_manifests()
             sat_api.docker_tags()
             sat_api.fact_values()
-            sat_api.smart_proxies_list()
             #############################
             #####DEPENDENT CALLS#########
             #############################
+            sat_api.organization_details()
             sat_api.activation_key_list()
             sat_api.auth_source_ldap_list()
             sat_api.content_views_list()
@@ -807,6 +802,7 @@ def main():
             sat_api.host_collection_list()
             sat_api.hostgroups_list()
             sat_api.hosts_lists()
+            sat_api.host_details()
             sat_api.rex_templates_list()
             sat_api.lce_list()
             sat_api.media_list()
@@ -824,8 +820,8 @@ def main():
             sat_api.cv_filter_list()
             sat_api.cv_history_list()
             sat_api.cv_puppet_modules_list()
+            sat_api.host_sub_list()
             sat_api.override_values_list()
-            sat_api.host_details()
             pulp_api.get_task(FULL_PATH)
             pulp_api.get_consumers(FULL_PATH)
             pulp_api.get_orphaned_repos(FULL_PATH)
@@ -880,7 +876,6 @@ def main():
             sat_api.discovered_hosts()
             sat_api.discovery_rules()
             sat_api.os_list()
-            sat_api.smart_proxy_list()
             sat_api.template_kind_list()
             sat_api.hostgroups_list()
             sat_api.media_list()
@@ -946,7 +941,6 @@ def main():
             sat_api.docker_registries()
             sat_api.rex_features_list()
             sat_api.reports_list()
-            sat_api.smart_proxy_list()
             sat_api.smart_variables_list()
             sat_api.statistics()
             sat_api.template_kind_list()
