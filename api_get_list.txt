@@ -1,0 +1,45 @@
+Auth source externals 
+Auth source internals 
+Auth sources 
+GET /api/compute_profiles/:id
+GET /api/compute_resources/:id
+GET /api/compute_resources/:id/available_images
+GET /api/compute_resources/:id/available_clusters
+GET /api/compute_resources/:id/available_flavors
+GET /api/compute_resources/:id/available_folders
+GET /api/compute_resources/:id/available_zones
+GET /api/compute_resources/:id/available_networks
+GET /api/compute_resources/:id/available_clusters/:cluster_id/available_networks
+GET /api/compute_resources/:id/available_clusters/:cluster_id/available_resource_pools
+GET /api/compute_resources/:id/available_storage_domains
+GET /api/compute_resources/:id/available_storage_domains/:storage_domain
+GET /api/compute_resources/:id/available_storage_pods
+GET /api/compute_resources/:id/available_storage_pods/:storage_pod
+GET /api/compute_resources/:id/available_security_groups
+GET /api/hosts/:host_id/config_reports/last
+GET /api/operatingsystems/:operatingsystem_id/config_templates
+GET /api/locations/:location_id/config_templates
+GET /api/organizations/:organization_id/config_templates
+GET /api/config_templates/:id
+GET /api/config_templates/revision
+GET /foreman_virt_who_configure/api/v2/configs
+GET /foreman_virt_who_configure/api/v2/organizations/:organization_id/configs
+GET /foreman_virt_who_configure/api/v2/configs/:id
+GET /foreman_virt_who_configure/api/v2/configs/:id/deploy_script
+GET /docker/api/v2/compute_resources/:compute_resource_id/containers
+GET /docker/api/v2/containers/:id
+GET /docker/api/v2/compute_resources/:compute_resource_id/containers/:id
+GET /docker/api/v2/containers/:id/logs
+GET /docker/api/v2/compute_resources/:compute_resource_id/containers/:id/logs
+GET /katello/api/content_views/:composite_content_view_id/content_view_components
+GET /katello/api/content_views/:composite_content_view_id/content_view_components/:id
+GET /katello/api/content_view_filters/:content_view_filter_id/rules
+GET /katello/api/content_view_filters/:content_view_filter_id/rules/:id
+GET /katello/api/debs
+GET /katello/api/content_views/:content_view_id/filters/:filter_id/debs
+GET /katello/api/content_view_filters/:content_view_filter_id/debs
+GET /katello/api/repositories/:repository_id/debs
+GET /katello/api/debs/:id
+GET /katello/api/repositories/:repository_id/debs/:id
+GET /katello/api/debs/compare
+Stopped at Discovery Rules
