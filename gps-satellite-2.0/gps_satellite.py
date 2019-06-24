@@ -244,7 +244,8 @@ class ApiCall(object):
     def arf_reports(self):
         print("Gathering all openscap arf reports from the Satellite")
         self.search("/api/v2/compliance/arf_reports", "openscap_arf_reports")
-
+        #self.search("/api/compliance/arf_reports", "openscap_arf_reports")
+        
     # Gather all audits from Satellite
     def audit_list(self):
         print("Gathering all audits from the Satellite")
